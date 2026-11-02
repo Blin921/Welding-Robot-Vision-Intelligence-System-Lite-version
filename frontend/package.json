@@ -12,7 +12,8 @@
     "test": "vitest run",
     "format": "prettier --write src scripts *.ts *.mjs *.json README.md",
     "postbuild": "node scripts/prepare-runtime.cjs",
-    "test:performance": "node scripts/performance-check.cjs"
+    "test:performance": "node scripts/performance-check.cjs",
+    "build:static": "node scripts/build-static.cjs"
   },
   "dependencies": {
     "lucide-react": "0.468.0",

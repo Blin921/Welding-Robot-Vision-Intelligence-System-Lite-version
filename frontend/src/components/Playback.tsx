@@ -28,7 +28,7 @@ export function usePlayback(program: Program | null, active = true) {
     document.addEventListener("visibilitychange", visibility);
     const tick = (time: number) => {
       if (!document.hidden && last) {
-        const elapsed = ((time - last) / 1000) * speed;
+        const elapsed = ((time - last) / 1000) * speed * 1.5;
         setSeconds((value) => Math.min(timeline.duration, value + elapsed));
       }
       last = time;

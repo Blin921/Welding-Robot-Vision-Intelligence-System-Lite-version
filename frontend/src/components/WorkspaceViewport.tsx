@@ -66,17 +66,19 @@ function Viewport({
   onNavigate: (tab: number) => void;
 }) {
   const { state, store } = useWorkspace();
-  const [mode, setMode] = useState<"语义" | "实例">("语义"),
+  const mode = "语义";
+  const
     [size, setSize] = useState(2),
     [grid, setGrid] = useState(true),
     [reset, setReset] = useState(0),
     [interaction, setInteraction] = useState<"orbit" | "pan">("orbit"),
     [zoom, setZoom] = useState(0),
+    [playbackTarget, setPlaybackTarget] = useState<HTMLElement | null>(null),
     [tcpTarget, setTcpTarget] = useState<HTMLElement | null>(null);
   useEffect(() => {
     let active = true;
     queueMicrotask(() => {
-      if (active) setTcpTarget(document.getElementById("tcp-context"));
+      if (active) { setTcpTarget(document.getElementById("tcp-context")); setPlaybackTarget(document.getElementById("simulation-playback")); }
     });
     return () => {
       active = false;
@@ -84,18 +86,9 @@ function Viewport({
   }, [tab]);
   const viewer = useRef<HTMLDivElement>(null);
   const generated = store.currentProgram(),
-    playback = usePlayback(generated?.data ?? null, false),
+    playback = usePlayback(generated?.data ?? null, tab === 5),
     cloud = state.cloud,
     push = store.currentPush();
-  const headings = [
-    "",
-    "三维点云预览",
-    "三维语义识别结果",
-    "标定点云与坐标系",
-    "多构件点云视图",
-    "轨迹预演",
-    "点云与轨迹视图",
-  ];
   const colors =
     mode === "语义"
       ? [
@@ -114,25 +107,13 @@ function Viewport({
         <div className="viewer-heading">
           <span>
             <Box size={17} />
-            {headings[tab]}
+            三维点云预览
           </span>
           <span className="viewport-label">
             <i /> REALTIME VIEWPORT
           </span>
         </div>
         <div className="viewer-toolbar">
-          <div className="segmented">
-            {(["语义", "实例"] as const).map((value) => (
-              <button
-                key={value}
-                className={mode === value ? "active" : ""}
-                onClick={() => setMode(value)}
-              >
-                {value === "语义" ? <Layers3 size={13} /> : <Box size={13} />}{" "}
-                {value}
-              </button>
-            ))}
-          </div>
           <button
             className={`toolbar-grid ${grid ? "on" : ""}`}
             onClick={() => setGrid(!grid)}
@@ -177,7 +158,7 @@ function Viewport({
           </button>
         </div>
         <div className="main-cloud">
-          <ProcessPresentation key={tab} stage={tab} light={light} active={tab !== 1} />
+          {tab !== 5 && <ProcessPresentation key={tab} stage={tab} light={light} active={tab !== 1} pointSize={size} />}
           {state.loading ? (
             <div className="cloud-loading">
               <LoaderCircle className="spin" />
@@ -193,7 +174,7 @@ function Viewport({
               size={size}
               reset={reset}
               grid={grid}
-              tcp={null}
+              tcp={tab === 5 ? playback.pose : null}
               tcpPath={generated?.data.waypoints_cam_mm}
               calibrationPairs={tab === 3 ? calibrationPairs : undefined}
               interaction={interaction}
@@ -321,6 +302,11 @@ function Viewport({
           </span>
         </div>
       </div>
+      {tab === 5 && playbackTarget && createPortal(<>
+        <label className="field"><span>预演速度</span><select aria-label="轨迹预演速度" value={playback.speed} onChange={e => playback.setSpeed(Number(e.target.value))}>{[0.25, 0.5, 1, 2, 4].map(speed => <option key={speed} value={speed}>{speed}×</option>)}</select></label>
+        <button className="primary wide" disabled={!generated} onClick={playback.toggle}>{playback.playing ? "暂停预演" : "开始预演"}</button>
+        <input aria-label="轨迹预演进度" type="range" min={0} max={100} value={playback.timeline.duration ? playback.seconds / playback.timeline.duration * 100 : 0} onChange={e => playback.seek(Number(e.target.value))} disabled={!generated} />
+      </>, playbackTarget)}
       {tab === 5 &&
         tcpTarget &&
         playback.pose &&

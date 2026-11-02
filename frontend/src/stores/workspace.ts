@@ -28,6 +28,7 @@ export interface WorkspaceState {
   loadError: string | null;
   cloud: CloudData | null;
   seams: Seam[];
+  recognitionReady: boolean;
   calibration: Calibration | null;
   selected: number | null;
   activeTask: TaskRecord | null;
@@ -54,6 +55,8 @@ export class WorkspaceStore {
   private version = 0;
   private serial = 0;
   private excludedFrames = new Set<string>();
+  private resetRecognitionFrames = new Set<string>();
+  private recognitionAnimationFrame: string | null = null;
   constructor(
     readonly api: WeldingApi,
     mode: AppMode,
@@ -68,6 +71,7 @@ export class WorkspaceStore {
       loadError: null,
       cloud: null,
       seams: [],
+      recognitionReady: false,
       calibration: null,
       selected: null,
       activeTask: null,
@@ -178,6 +182,7 @@ export class WorkspaceStore {
           frame: "",
           cloud: null,
           seams: [],
+      recognitionReady: false,
           calibration: null,
           selected: null,
         });
@@ -213,6 +218,7 @@ export class WorkspaceStore {
       loadError: null,
       cloud: null,
       seams: [],
+      recognitionReady: false,
       calibration: this.calibrations.get(frame) ?? null,
       selected: null,
     });
@@ -252,17 +258,43 @@ export class WorkspaceStore {
       )
         this.invalidatePrograms(frame);
     }
-    const items = seams.status === "fulfilled" ? seams.value.seams : [];
+    const recognitionReady = !this.resetRecognitionFrames.has(frame) &&
+      this.state.frames.find(item => item.id === frame)?.has_artifacts !== false;
+    const items = recognitionReady && seams.status === "fulfilled" ? seams.value.seams : [];
     this.patch({
       loading: false,
       cloud: view.status === "fulfilled" ? view.value : null,
       seams: items,
+      recognitionReady,
       selected: items[0]?.id ?? null,
       calibration,
       loadError: errors[0] ?? null,
     });
     if (errors.length) this.notify(errors[0], "error");
   }
+  beginRecognitionAnimation = (frame: string) => {
+    this.recognitionAnimationFrame = frame;
+    this.resetRecognitionFrames.add(frame);
+    if (this.state.frame === frame) this.patch({ recognitionReady: false, seams: [], selected: null });
+  };
+  finishRecognitionAnimation = () => {
+    const frame = this.recognitionAnimationFrame;
+    this.recognitionAnimationFrame = null;
+    if (!frame || this.disposed) return;
+    const latest = this.state.history.find(task => task.kind === "recognize" && task.frame === frame);
+    if (latest?.state === "done" && !(this.state.activeTask?.kind === "recognize" && this.state.activeTask.frame === frame)) {
+      this.resetRecognitionFrames.delete(frame);
+      if (this.state.frame === frame) void this.selectFrame(frame);
+    }
+  };
+  resetRecognition = () => {
+    const { frame, activeTask, pending, loading } = this.state;
+    if (!frame || activeTask || pending || loading) return;
+    this.resetRecognitionFrames.add(frame);
+    this.invalidatePrograms(frame);
+    this.patch({ seams: [], selected: null, recognitionReady: false });
+    this.notify("当前帧识别结果已重置，请重新开始识别");
+  };
   selectSeam = (id: number) => {
     if (this.state.seams.some((s) => s.id === id)) this.patch({ selected: id });
   };
@@ -277,6 +309,7 @@ export class WorkspaceStore {
       frame: "",
       cloud: null,
       seams: [],
+      recognitionReady: false,
       selected: null,
       calibration: null,
       loading: false,
@@ -370,6 +403,10 @@ export class WorkspaceStore {
       frame,
       createdAt: new Date().toLocaleTimeString("zh-CN", { hour12: false }),
     };
+    if (kind === "recognize") {
+      this.resetRecognitionFrames.add(frame);
+      if (this.state.frame === frame) this.patch({ seams: [], selected: null, recognitionReady: false });
+    }
     this.patch({ activeTask: initial, pollError: null });
     this.appendLog(`${kind === "scan" ? "采集" : "识别"}任务提交中`);
     try {
@@ -442,6 +479,7 @@ export class WorkspaceStore {
           return;
         }
         if (job.kind === "recognize") {
+          if (this.recognitionAnimationFrame !== task.frame) this.resetRecognitionFrames.delete(task.frame);
           this.cloudCache.delete(task.frame);
           this.invalidatePrograms(task.frame);
         }

@@ -531,6 +531,9 @@ export default function PointCloud(props: Props) {
       orthographic.right = halfHeight * perspective.aspect;
       orthographic.top = halfHeight;
       orthographic.bottom = -halfHeight;
+      // Raise the rendered scene within the viewport without moving UI or geometry.
+      perspective.setViewOffset(width, height, 0, height * 0.10, width, height);
+      orthographic.setViewOffset(width, height, 0, height * 0.10, width, height);
       camera.updateProjectionMatrix();
       for (const l of lines.values()) l.material.resolution.set(width, height);
       travelled.material.resolution.set(width, height);

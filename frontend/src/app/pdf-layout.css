@@ -964,3 +964,44 @@ html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background:
 .pdf-app .page-3 .calibration-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
 .pdf-app .page-3 .calibration-buttons > button { width: 100%; min-width: 0; margin: 0; padding: 8px 6px; min-height: 36px; font-size: 14px; line-height: 1.3; white-space: nowrap; }
 .pdf-app .page-3 .calibration-buttons > button:last-child { grid-column: 1 / -1; }
+
+/* Seam recognition follows the two-column modeling workspace. */
+.pdf-app .page-2 .left-column { overflow-y: auto; gap: 10px; }
+.pdf-app .page-2 .recognition-actions { border: 0; padding-top: 0; margin-top: 8px; }
+.pdf-app .page-2 .recognition-start { flex: 0 0 auto; }
+.pdf-app .page-2 .sidebar-foot { display: none; }
+.pdf-app .page-2 .compact-seams .seam-card { grid-template-columns: minmax(0, 1fr); }
+
+/* Recognition animation starts directly below its viewport heading. */
+.pdf-app .page-2 .viewer { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; }
+.pdf-app .page-2 .viewer-heading { grid-column: 1; grid-row: 1; padding: 10px; }
+.pdf-app .page-2 .viewport-label { display: none; }
+.pdf-app .page-2 .viewer-toolbar { grid-column: 2; grid-row: 1; justify-content: flex-end; align-items: center; padding: 6px 10px; gap: 6px; }
+.pdf-app .page-2 .viewer-toolbar .segmented > button { min-width: 52px; }
+.pdf-app .page-2 .point-size { margin-left: 0; }
+.pdf-app .page-2 .main-cloud { grid-column: 1 / -1; grid-row: 2; }
+.pdf-app .page-2 .viewer > .viewport-status { grid-column: 1 / -1; grid-row: 3; }
+.pdf-app .page-2 .main-cloud > .process-launch { top: 12px; bottom: auto; }
+@media (max-width: 1100px) {
+  .pdf-app .page-2 .viewer-toolbar { grid-column: 1 / -1; grid-row: 3; flex-wrap: wrap; }
+  .pdf-app .page-2 .viewer > .viewport-status { grid-row: 4; }
+  .pdf-app .page-2 .viewer { grid-template-rows: auto minmax(0, 1fr) auto auto; }
+}
+
+.pdf-app .page-5 .left-column { overflow-y: auto; gap: 10px; }
+.pdf-app .page-5 .left-column > .panel { flex: 0 0 auto; }
+.pdf-app .page-5 .sidebar-foot { display: none; }
+.pdf-app .page-5 .code-preview { max-height: 240px; overflow: auto; }
+.pdf-app .page-5 #simulation-playback { display: flex; flex-direction: column; gap: 10px; }
+.pdf-app .page-5 .mono { overflow-wrap: anywhere; }
+
+.pdf-app .recognition-start { display: flex; flex-direction: column; gap: 8px; }
+
+/* Advanced accordions follow the active theme instead of a fixed light fill. */
+.pdf-app:not(.light) .left-column details > summary {
+  background: var(--heading);
+  color: var(--text);
+  border-color: var(--border);
+}
+.pdf-app:not(.light) .left-column details > summary:hover { background: var(--input); }
+.pdf-app:not(.light) .left-column details > summary::after { color: var(--muted); }

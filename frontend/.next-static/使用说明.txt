@@ -1,0 +1,7 @@
+静态网页
+
+解压整个文件夹，保留全部资源目录。
+安装 Python 后，双击“预览网页.cmd”，浏览器访问 http://localhost:8080 。
+也可将整个目录部署到静态网站根目录。请通过 HTTP 访问，不要直接双击 index.html。
+默认浏览器演示模式。真实采集、识别和 FTP 下发仍需要后端服务。
+重新生成：在 frontend 中运行 npm run build:static。

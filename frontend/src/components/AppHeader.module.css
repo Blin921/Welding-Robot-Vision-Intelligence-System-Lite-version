@@ -33,3 +33,35 @@
 /* Transparent artwork retains the complete gear outline and white lettering. */
 .header .brand img { object-fit: contain; clip-path: none; mix-blend-mode: normal; }
 .dark .brand img { mix-blend-mode: normal; }
+
+/* Balance the brand, centered navigation and three utility controls. */
+.header { display: grid; grid-template-columns: minmax(300px, 1fr) auto minmax(120px, 1fr); gap: 24px; padding-inline: 24px; }
+.header .brand { justify-self: start; gap: 10px; }
+.brand strong { font-size: clamp(18px, 1.4vw, 24px); }
+.header nav { margin: 0; gap: 6px; height: auto; padding: 5px; border-radius: 12px; background: #b6c8cf30; }
+.header nav button { height: 42px; padding: 0 20px; border-radius: 8px; gap: 8px; }
+.header nav button[aria-current="page"] { background: #f0f5f6; box-shadow: 0 2px 6px #455e7014; }
+.tools { justify-self: end; gap: 10px; }
+.tools button { width: 36px; height: 36px; border-radius: 9px; }
+.tools button:hover { background: #9aafb82b; }
+.dark nav { background: #0d192280; }
+.dark nav button[aria-current="page"] { background: #263b49; }
+@media (max-width: 1200px) {
+  .header { grid-template-columns: auto minmax(0, 1fr) auto; gap: 12px; padding-inline: 14px; }
+  .header nav { justify-self: center; gap: 2px; }
+  .header nav button { padding-inline: 12px; font-size: 14px; }
+  .brand strong { font-size: 18px; }
+  .header .brand img { width: 52px; height: 52px; min-width: 52px; flex-basis: 52px; }
+}
+@media (max-width: 900px) {
+  .header .brand strong { font-size: 15px; }
+  .header nav button { padding-inline: 8px; }
+  .tools { gap: 2px; }
+}
+@media (max-width: 700px) {
+  .header { grid-template-columns: auto 1fr auto; gap: 6px; padding-inline: 8px; }
+  .header .brand strong { display: none; }
+  .header nav button { padding-inline: 6px; font-size: 12px; gap: 3px; }
+  .header nav button svg { display: none; }
+  .tools button { width: 28px; }
+}

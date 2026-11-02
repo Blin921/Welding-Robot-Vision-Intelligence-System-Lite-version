@@ -17,9 +17,11 @@ export default function SeamList({
   minLength,
   onAction,
   compact = false,
+  hideActions = false,
 }: {
   minLength: number;
   compact?: boolean;
+  hideActions?: boolean;
   onAction: (
     action: "view" | "preview" | "program" | "push",
     id: number,
@@ -90,13 +92,13 @@ export default function SeamList({
               <span className="mono">
                 {s.length_mm.toFixed(1)} <small>mm</small>
               </span>
-              <ChevronRight size={14} />
+              {!hideActions && <ChevronRight size={14} />}
             </button>
             <p>
               {s.shape}
               <span>{s.type}</span>
             </p>
-            <div className="seam-actions">
+            {!hideActions && <div className="seam-actions">
               <button onClick={() => onAction("view", s.id)}>
                 <Eye />
                 查看
@@ -113,7 +115,7 @@ export default function SeamList({
                 <Send />
                 下发
               </button>
-            </div>
+            </div>}
           </div>
         ))}
       </div>

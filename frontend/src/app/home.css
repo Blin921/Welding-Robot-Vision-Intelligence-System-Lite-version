@@ -56,3 +56,154 @@
 
 .home-page .workflow-cards, .workflow-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 @media (max-width: 900px) { .home-page .workflow-cards, .workflow-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* Three complete workflow entries use the full width of the homepage. */
+.pdf-app .home-overview { grid-template-rows: minmax(280px, 1.1fr) minmax(240px, 1fr); gap: 20px; padding: 8px 12px 12px; }
+.pdf-app .home-overview .hero { grid-template-columns: minmax(0, 44%) minmax(0, 56%); border-radius: 18px; border: 1px solid #a9becb40; background: #e4edf24d; }
+.pdf-app .home-overview .hero-copy { padding: 24px 32px; gap: 16px; }
+.pdf-app .home-overview .hero h1 { font-size: clamp(30px, 2.6vw, 46px); }
+.pdf-app .home-overview .home-intro { max-width: 440px; margin: 0; color: #60798b; font-size: 15px; line-height: 1.8; }
+.pdf-app .home-overview .hero-actions { max-width: 460px; gap: 10px; }
+.home-workflow { min-height: 0; display: flex; flex-direction: column; gap: 12px; }
+.home-section-heading { display: flex; justify-content: space-between; align-items: end; gap: 16px; padding: 0 4px; }
+.home-section-heading span { font-size: 12px; color: #b65a21; }
+.home-section-heading h2 { margin: 4px 0 0; font-size: 20px; color: #243e56; }
+.home-section-heading p { margin: 0 0 2px; color: #708899; font-size: 13px; }
+.pdf-app .home-overview .workflow-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); flex: 1; gap: 16px; }
+.pdf-app .home-overview .workflow-card { padding: 18px 20px 10px; border-color: #abc0cf70; }
+.pdf-app .home-overview .feature-heading { gap: 10px; }
+.pdf-app .home-overview .feature-heading > h2 { font-size: 20px; }
+.pdf-app .home-overview .workflow-card > p { padding-left: 0; font-size: 13px; margin-top: 4px; }
+.pdf-app .home-overview .home-feature-art { transform: scale(1); }
+.pdf-app .home-overview .feature-image { min-height: 85px; }
+.pdf-app:not(.light) .home-overview .hero { background: #14243160; border-color: #35516a66; }
+.pdf-app:not(.light) .home-overview .home-intro, .pdf-app:not(.light) .home-section-heading p { color: #99afc0; }
+.pdf-app:not(.light) .home-section-heading h2 { color: #e3edf6; }
+@media (max-height: 760px) {
+  .pdf-app .home-overview { grid-template-rows: minmax(240px, 1fr) minmax(210px, 1fr); gap: 12px; overflow: auto; }
+  .pdf-app .home-overview .hero-copy { gap: 10px; padding-block: 16px; }
+  .pdf-app .home-overview .hero h1 { font-size: 30px; }
+}
+@media (max-width: 900px) {
+  .pdf-app .home-overview .hero-copy { padding-inline: 20px; }
+  .pdf-app .home-overview .hero-actions { flex-wrap: wrap; }
+  .pdf-app .home-overview .hero-actions > button { flex-basis: 100%; min-height: 36px; height: 36px; }
+  .home-section-heading p { display: none; }
+}
+@media (max-width: 700px) {
+  .pdf-app .home-overview { grid-template-rows: minmax(340px, auto) auto; padding: 4px; overflow: auto; }
+  .pdf-app .home-overview .hero { grid-template-columns: 1fr; }
+  .pdf-app .home-overview .hero-copy { justify-content: center; }
+  .pdf-app .home-overview .workflow-cards { grid-template-columns: 1fr; grid-auto-rows: 220px; }
+}
+
+.pdf-app .home-overview .hero-actions { max-width: 220px; }
+.home-cloud-showcase { position: absolute; inset: 12px; overflow: hidden; border: 1px solid #41607270; border-radius: 14px; background: radial-gradient(ellipse at 50% 45%, #163545, #081923 78%); }
+.home-cloud-render { position: absolute; inset: 0; }
+.home-cloud-render canvas { display: block; width: 100%; height: 100%; }
+.home-cloud-caption { position: absolute; top: 18px; left: 20px; pointer-events: none; }
+.home-cloud-caption span { display: block; color: #7cb8c9; font-size: 11px; letter-spacing: 2px; }
+.home-cloud-caption strong { display: block; margin-top: 7px; font-size: 16px; font-weight: 500; color: #d6eaf2; }
+.home-cloud-key { position: absolute; bottom: 16px; left: 20px; display: flex; align-items: center; gap: 8px; color: #99b8c6; font-size: 11px; pointer-events: none; }
+.home-cloud-key i, .home-cloud-key b { width: 6px; height: 6px; border-radius: 50%; background: #65d9ee; }
+.home-cloud-key b { background: #ff9f43; margin-left: 12px; }
+.home-cloud-render > p { padding: 70px 20px; color: #99b8c6; }
+
+/* A full-height 3D background occupies the right half of the homepage. */
+.pdf-app .home-overview { position: relative; }
+.home-background-cloud { position: absolute; inset: 0 -12px 0 44%; z-index: 0; pointer-events: none; mask-image: linear-gradient(to right, transparent, #000 15%, #000 94%, transparent); }
+.home-background-cloud .home-cloud-showcase { inset: 0; border: 0; border-radius: 0; background: transparent; }
+.home-background-cloud .home-cloud-render { pointer-events: none; }
+.pdf-app .home-overview .hero { z-index: 1; display: block; overflow: visible; background: transparent; border: 0; box-shadow: none; }
+.pdf-app .home-overview .hero::before { display: none; }
+.pdf-app .home-overview .hero-copy { width: 48%; height: 100%; box-sizing: border-box; }
+.pdf-app .home-overview .home-workflow { position: relative; z-index: 1; }
+.pdf-app .home-overview .workflow-card { background: linear-gradient(145deg, #f9fcffb8, #edf5ffad); backdrop-filter: blur(10px); }
+.pdf-app:not(.light) .home-overview .hero { background: transparent; border: 0; }
+.pdf-app:not(.light) .home-overview .workflow-card { background: linear-gradient(145deg, #1a3042ba, #142533c9); }
+@media (max-width: 900px) { .pdf-app .home-overview .hero-copy { width: 55%; } }
+@media (max-width: 700px) {
+  .home-background-cloud { left: 18%; bottom: auto; height: 350px; opacity: 0.35; }
+  .pdf-app .home-overview .hero-copy { width: 100%; }
+}
+
+/* Homepage redesign: architectural spacing, a large point-cloud stage and compact workflow entries. */
+.pdf-app.app:has(.home-overview) { background: radial-gradient(ellipse at 80% 30%, #d4e5ed, transparent 56%), linear-gradient(135deg, #eef3f4, #e5edef 70%); }
+.pdf-app .home-overview { padding: 12px 28px 22px; gap: 24px; grid-template-rows: minmax(320px, 1.5fr) minmax(210px, 0.85fr); }
+.home-background-cloud { inset: -16px -28px 24% 37%; mask-image: linear-gradient(to right, transparent, #000 18%, #000 93%, transparent); }
+.pdf-app .home-overview .hero-copy { width: 49%; padding: 24px 8px; gap: 19px; }
+.pdf-app .home-overview .home-eyebrow { font-size: 12px; letter-spacing: 2px; color: #617986; }
+.pdf-app .home-overview .hero h1 { font-size: clamp(32px, 3vw, 52px); line-height: 1.3; letter-spacing: -1px; color: #1b3543; }
+.pdf-app .home-overview .home-intro { max-width: 400px; font-size: 14px; line-height: 1.9; color: #697f8c; }
+.home-capabilities { display: flex; align-items: center; gap: 12px; color: #526f7d; font-size: 12px; }
+.home-capabilities i { width: 3px; height: 3px; background: #a3b7c0; border-radius: 50%; }
+.pdf-app .home-overview .hero-actions { max-width: 205px; margin-top: 3px; }
+.pdf-app .home-overview .hero-actions > .primary { border-radius: 8px; box-shadow: 0 5px 14px #d6772520; height: 44px; min-height: 44px; font-size: 14px; }
+.home-scene-label { position: absolute; top: 20px; right: 30px; z-index: 2; display: flex; align-items: center; gap: 8px; color: #66818f; font-size: 11px; pointer-events: none; }
+.home-scene-dot { width: 5px; height: 5px; background: #16938b; border-radius: 50%; box-shadow: 0 0 0 4px #16938b12; }
+.home-scene-divider { height: 10px; width: 1px; background: #a9bdc6; margin-inline: 5px; }
+.home-workflow { gap: 14px; }
+.home-section-heading { padding: 0; }
+.home-section-heading span { font-size: 11px; color: #a96a3d; letter-spacing: 1px; }
+.home-section-heading h2 { font-size: 19px; margin-top: 5px; }
+.home-section-heading p { font-size: 11px; }
+.pdf-app .home-overview .workflow-cards { gap: 18px; }
+.pdf-app .home-overview .workflow-card { padding: 20px; border-radius: 12px; border-color: #bccfd67d; background: #f5f9fae8; gap: 8px; transition: transform .2s, border-color .2s, box-shadow .2s; }
+.pdf-app .home-overview .workflow-card:hover { transform: translateY(-3px); box-shadow: 0 10px 24px #45647712; border-color: #c8936d; }
+.pdf-app .home-overview .feature-heading { width: 68%; gap: 8px; flex-wrap: nowrap; }
+.pdf-app .home-overview .feature-heading > h2 { font-size: 18px; }
+.pdf-app .home-overview .feature-heading > .home-feature-index { color: #9cb2bd; font-size: 15px; min-width: 22px; font-style: normal; }
+.pdf-app .home-overview .feature-heading > svg { display: none; }
+.pdf-app .home-overview .feature-heading > span:last-child { display: none; }
+.pdf-app .home-overview .workflow-card > p { width: 63%; color: #768c98; font-size: 12px; line-height: 1.8; margin: 0; }
+.home-card-action { display: flex; align-items: center; gap: 10px; color: #b75d22; font-size: 12px; margin-top: auto; z-index: 1; }
+.pdf-app .home-overview .feature-image { position: absolute; top: 16px; bottom: 8px; right: 2px; width: 36%; margin: 0; min-height: 0; opacity: .85; pointer-events: none; }
+.pdf-app .home-overview .home-feature-art { transform: scale(1.12); }
+.pdf-app:not(.light):has(.home-overview) { background: radial-gradient(ellipse at 75% 25%, #183443, transparent 65%), #0c1922; }
+.pdf-app:not(.light) .home-scene-label, .pdf-app:not(.light) .home-capabilities { color: #8fabb9; }
+.pdf-app:not(.light) .home-overview .workflow-card { background: #152a36e8; border-color: #35515e; }
+.pdf-app:not(.light) .home-card-action { color: #e8a06b; }
+@media (max-height: 760px) {
+  .pdf-app .home-overview { grid-template-rows: minmax(270px, 1.3fr) minmax(190px, 1fr); padding-block: 4px 12px; gap: 12px; }
+  .pdf-app .home-overview .hero-copy { gap: 11px; padding-block: 12px; }
+  .pdf-app .home-overview .hero h1 { font-size: 34px; }
+  .pdf-app .home-overview .workflow-card { padding: 16px; }
+}
+@media (max-width: 1000px) {
+  .pdf-app .home-overview { padding-inline: 16px; }
+  .pdf-app .home-overview .hero-copy { width: 54%; }
+  .pdf-app .home-overview .workflow-card { padding: 14px; }
+  .pdf-app .home-overview .feature-heading > h2 { font-size: 16px; }
+  .pdf-app .home-overview .workflow-card > p { width: 72%; font-size: 11px; }
+  .pdf-app .home-overview .feature-image { opacity: .55; }
+}
+@media (max-width: 700px) {
+  .pdf-app .home-overview { grid-template-rows: 360px auto; padding: 8px; }
+  .pdf-app .home-overview .hero-copy { width: 100%; }
+  .home-background-cloud { left: 25%; top: 0; bottom: auto; height: 360px; opacity: .22; }
+  .home-scene-label { display: none; }
+  .pdf-app .home-overview .workflow-cards { grid-template-columns: 1fr; grid-auto-rows: 160px; }
+}
+
+/* Canva-directed composition: quiet copy, generous 3D stage, one workflow strip. */
+.pdf-app .home-overview { grid-template-rows: minmax(310px, 1.65fr) minmax(210px, .85fr); }
+.pdf-app .home-overview .hero-copy { width: 45%; gap: 18px; }
+.pdf-app .home-overview .hero h1 { font-size: clamp(32px, 2.8vw, 49px); line-height: 1.32; }
+.pdf-app .home-overview .home-intro { max-width: 365px; }
+.home-background-cloud { inset: -10px -28px 20% 35%; }
+.pdf-app .home-overview .workflow-card { background: linear-gradient(130deg, #f7fafbe8, #edf4f5e0); box-shadow: inset 0 1px 0 #ffffffb3; }
+.pdf-app .home-overview .feature-heading > .home-feature-index { border: 1px solid #b5cbd370; border-radius: 6px; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #77909c; }
+.pdf-app .home-overview .workflow-card:hover .home-feature-index { color: #c46a2b; border-color: #d9a17a; }
+.pdf-app:not(.light) .home-overview .workflow-card { background: linear-gradient(130deg, #1a303de8, #142832e8); box-shadow: inset 0 1px 0 #70919f18; }
+@media (max-height: 760px) { .pdf-app .home-overview { grid-template-rows: minmax(270px, 1.3fr) minmax(190px, 1fr); } }
+@media (max-width: 1000px) { .pdf-app .home-overview .hero-copy { width: 54%; } }
+@media (max-width: 700px) {
+  .pdf-app .home-overview { grid-template-rows: 360px auto; }
+  .pdf-app .home-overview .hero-copy { width: 100%; }
+  .home-background-cloud { left: 25%; top: 0; bottom: auto; height: 360px; }
+}
+
+/* The background sphere accepts orbit gestures; foreground controls stay above it. */
+.home-background-cloud { pointer-events: auto; }
+.pdf-app .home-overview .hero { pointer-events: none; }
+.pdf-app .home-overview .hero-copy { pointer-events: auto; }

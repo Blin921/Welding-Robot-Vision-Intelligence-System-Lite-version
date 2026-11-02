@@ -174,14 +174,7 @@ export default function WorkflowControls({
                     ))}
                   </select>
                 </label>
-                <button
-                  className="primary wide"
-                  disabled={!state.frame || state.loading}
-                  onClick={() => void store.selectFrame(state.frame)}
-                >
-                  <FileUp size={16} />
-                  载入点云
-                </button>
+
               </>
             )}
             {tab === 2 && (
@@ -205,24 +198,7 @@ export default function WorkflowControls({
                     }
                   />
                 </label>
-                <button
-                  className="primary wide"
-                  disabled={locked || pending || !state.frame}
-                  onClick={() => {
-                    const error = validateRecognition(forms.recognize);
-                    if (error) store.notify(error, "error");
-                    else
-                      void store.run("recognize", {
-                        ...forms.recognize,
-                        frame: state.frame,
-                      });
-                  }}
-                >
-                  {!locked && <Play size={15} />}
-                  <Busy busy={state.activeTask?.kind === "recognize"}>
-                    {locked ? "任务进行中" : "开始识别"}
-                  </Busy>
-                </button>
+
               </div>
             )}
           </Panel>
@@ -323,7 +299,7 @@ export default function WorkflowControls({
                 title="高级识别参数"
                 icon={<Settings2 />}
                 collapsible
-                defaultOpen={true}
+                defaultOpen={false}
               >
                 {field("recognize", "voxel", "voxel 体素", "mm", 0.001)}
                 {field("recognize", "tile", "tile 块大小", "mm", 0.001)}
@@ -341,12 +317,43 @@ export default function WorkflowControls({
                 {field("recognize", "max_gap", "max_gap 间隙", "m", 0.000001)}
                 {field("recognize", "min_len", "最短焊缝长度", "mm", 0)}
               </Panel>
+              <div className="recognition-start">
+                <button
+                  className="primary wide"
+                  disabled={locked || pending || !state.frame}
+                  onClick={() => {
+                    const error = validateRecognition(forms.recognize);
+                    if (error) store.notify(error, "error");
+                    else
+                      void store.run("recognize", {
+                        ...forms.recognize,
+                        frame: state.frame,
+                      });
+                  }}
+                >
+                  {!locked && <Play size={15} />}
+                  <Busy busy={state.activeTask?.kind === "recognize"}>
+                    {locked ? "任务进行中" : "开始识别"}
+                  </Busy>
+                </button>
+              </div>
             </>
           )}
         </>
       )}
+      {tab === 5 && <Panel title="1. 选择点云与焊缝" icon={<Database />}>
+        <label className="field"><span>PCD 文件</span><select aria-label="模拟点云文件" value={state.frame} disabled={pending || state.loading} onChange={e => void store.selectFrame(e.target.value)}>
+          <option value="" disabled>请选择已导入的点云</option>
+          {state.frames.map(frame => <option key={frame.id} value={frame.id}>{frame.id}</option>)}
+        </select></label>
+        <label className="field"><span>已识别焊缝</span><select aria-label="模拟焊缝" value={state.selected ?? ""} disabled={state.loading || !state.seams.length} onChange={e => store.selectSeam(Number(e.target.value))}>
+          <option value="" disabled>请选择已识别焊缝</option>
+          {state.seams.map(seam => <option key={seam.id} value={seam.id}>W{String(seam.id).padStart(3, "0")} · {seam.length_mm.toFixed(1)} mm</option>)}
+        </select></label>
+        {!state.seams.length && <Notice>此帧暂无焊缝，请先在焊缝识别页面完成识别。</Notice>}
+      </Panel>}
       {tab === 5 && (
-        <Panel title="程序与轨迹预演" icon={<FileCode2 />}>
+        <Panel title="2. 配置并生成 LS 程序" icon={<FileCode2 />}>
           <form noValidate
             onSubmit={(e) => {
               e.preventDefault();
@@ -474,8 +481,15 @@ export default function WorkflowControls({
           </form>
         </Panel>
       )}
-      {tab === 6 && (
-        <Panel title="FTP 文件传输" icon={<Send />}>
+      {tab === 5 && <>
+        <Panel title="3. 轨迹预演" icon={<Play />}><div id="simulation-playback" /></Panel>
+        <Panel title="4. 保存 LS 程序" icon={<FileCode2 />}>
+          {program ? <><p className="mono">{program.data.ls_name}</p><details><summary>查看程序文本</summary><pre className="code-preview">{program.data.ls_text}</pre></details></> : <p className="hint">生成程序后可预演和保存。</p>}
+          <button className="secondary wide" disabled={!program || pending} onClick={() => void store.download()}>保存 .LS 文件</button>
+        </Panel>
+      </>}
+      {tab === 5 && (
+        <Panel title="5. 程序下发" icon={<Send />}>
           <form noValidate
             onSubmit={(e) => {
               e.preventDefault();
@@ -527,9 +541,9 @@ export default function WorkflowControls({
             </Notice>
             <button
               className="primary wide"
-              disabled={pending || state.loading}
+              disabled={pending || state.loading || !program}
             >
-              <Busy busy={state.pending === "push"}>预览下发确认</Busy>
+              <Busy busy={state.pending === "push"}>程序下发</Busy>
               <Send size={15} />
             </button>
             {state.mode === "demo" && (
@@ -540,6 +554,10 @@ export default function WorkflowControls({
           </form>
         </Panel>
       )}
+      {tab === 5 && <Panel title="6. 下发结果" icon={<Send />}>
+        {store.currentPush() ? <div role="status"><p>{state.mode === "demo" ? "模拟下发成功（未连接设备）" : "程序下发成功"}</p><p className="mono">{store.currentPush()!.remote_path}</p><p>{store.currentPush()!.bytes} 字节</p></div> : <p className="hint">{state.pending === "push" ? "正在下发程序…" : "尚未下发当前程序"}</p>}
+        {state.logs.filter(log => log.kind === "error").slice(-1).map(log => <Notice key={log.id} warning>{log.text}</Notice>)}
+      </Panel>}
     </>
   );
 }

@@ -12,7 +12,6 @@ import {
   Home, ScanLine, Crosshair, Layers3, Workflow, Send, Settings2, UserRound, SlidersHorizontal, Activity,
   ChevronDown,
   ChevronUp,
-  ChevronsDown,
   CloudUpload,
   Database,
   Download,
@@ -39,7 +38,6 @@ import { useWorkspace } from "../../stores/provider";
 import {
   DEFAULT_SCAN,
   type AppMode,
-  type LogEntry,
   type ScanRequest,
 } from "../../lib/types";
 import { validateScan } from "../../lib/validation";
@@ -90,27 +88,13 @@ function Sprite({
   return <span aria-hidden="true" className={`${styles.sprite} ${heading ? styles.nativeHeading : ""} ${nav >= 0 ? styles.nativeNav : ""} ${className}`}
     style={{ width: w, height: h, ...style }}>{content}</span>;
 }
-function EyeIcon({ hidden = false }: { hidden?: boolean }) {
-  return (
-    <svg viewBox="0 0 24 20" width="20" height="17" aria-hidden="true">
-      <path
-        d="M1 10S5 2 12 2s11 8 11 8-4 8-11 8S1 10 1 10Z"
-        fill="currentColor"
-      />
-      <circle cx="12" cy="10" r="4.6" fill="#e3e9eb" />
-      <circle cx="12" cy="10" r="2.6" fill="currentColor" />
-      {hidden && <path d="m3 2 18 16" stroke="#e3e9eb" strokeWidth="4" />}
-      {hidden && <path d="m3 2 18 16" stroke="currentColor" strokeWidth="2" />}
-    </svg>
-  );
-}
 const navigation = [
-  { label: "首页", x: 291, y: 30, w: 79, h: 37 },
-  { label: "数据采集", x: 393, y: 29, w: 115, h: 39 },
-  { label: "AI识别", x: 529, y: 29, w: 93, h: 38 },
+  { label: "技术流程", x: 291, y: 30, w: 79, h: 37 },
+  { label: "点云建模", x: 393, y: 29, w: 115, h: 39 },
+  { label: "焊缝识别", x: 529, y: 29, w: 93, h: 38 },
   { label: "坐标标定", x: 646, y: 29, w: 116, h: 38 },
   { label: "焊缝管理", x: 774, y: 29, w: 114, h: 38 },
-  { label: "程序与预演", x: 900, y: 29, w: 132, h: 38 },
+  { label: "焊接模拟", x: 900, y: 29, w: 132, h: 38 },
   { label: "程序下发", x: 1041, y: 29, w: 109, h: 38 },
 ];
 type Dialog = "settings" | "profile" | "clear" | null;
@@ -133,7 +117,6 @@ export default function AcquisitionPage({
 }) {
   const { state, store } = useWorkspace();
   const compact = useCompact();
-  const [compactPanel, setCompactPanel] = useState<"workflow" | "context">("workflow");
   const outer = useRef<HTMLDivElement>(null),
     viewport = useRef<HTMLElement>(null),
     cloudRef = useRef<CloudHandle>(null),
@@ -148,14 +131,9 @@ export default function AcquisitionPage({
     [measurement, setMeasurement] = useState<Measurement | null>(null),
     [uploadMenu, setUploadMenu] = useState(false),
     [logMenu, setLogMenu] = useState(false),
-    [logKind, setLogKind] = useState<"all" | "scan" | "error" | "upload">(
-      "all",
-    ),
     [dialog, setDialog] = useState<Dialog>(null),
     [dragging, setDragging] = useState(false),
     [folded, setFolded] = useState<Record<string, boolean>>({}),
-    [drawer, setDrawer] = useState<"current" | "history" | null>(null),
-    [historyId, setHistoryId] = useState<string | null>(null),
     [projection, setProjection] = useState(false);
   const current = state.frames.find((frame) => frame.id === state.frame),
     busy = Boolean(state.activeTask),
@@ -189,7 +167,6 @@ export default function AcquisitionPage({
         setDialog(null);
         setUploadMenu(false);
         setLogMenu(false);
-        setDrawer(null);
         setTool("rotate");
         cloudRef.current?.clearMeasurement();
       }
@@ -285,17 +262,6 @@ export default function AcquisitionPage({
       store.notify("浏览器未允许全屏，请检查浏览器设置", "error");
     }
   }
-  const logs = state.logs.filter(
-    (log) =>
-      logKind === "all" ||
-      (logKind === "error" && log.kind === "error") ||
-      (logKind === "scan" && /采集|相机|扫描/.test(log.text)) ||
-      (logKind === "upload" && /点云|上传|文件/.test(log.text)),
-  );
-  const selectedTask =
-    state.history.find((task) => task.id === historyId) ??
-    state.activeTask ??
-    state.history[0];
   const numeric = (key: "scan_ms" | "exp_us", value: string) =>
     setScan((previous) => ({
       ...previous,
@@ -308,174 +274,6 @@ export default function AcquisitionPage({
     setProjection(false);
     cloudRef.current?.reset();
   };
-  const contextPanels = <>
-          <section
-            className={`${styles.panel} ${styles.infoPanel} ${folded.info ? styles.folded : ""}`}
-          >
-            <button
-              className={styles.panelHeading}
-              aria-label="折叠或展开当前帧信息"
-              aria-expanded={!folded.info}
-              onClick={() => toggle("info")}
-            >
-              <Sprite
-                x={1241}
-                y={108}
-                w={155}
-                h={30}
-                style={{ position: "absolute", left: 15, top: 9 }}
-              />
-              {folded.info ? <ChevronDown /> : <ChevronUp />}
-            </button>
-            <div className={styles.infoGrid} hidden={folded.info}>
-              {[
-                ["当前帧", filename(state.frame)],
-                ["文件格式", state.frame ? "PCD" : "—"],
-                ["点云数量", cloud ? String(cloud.header.n_full) : "—"],
-                ["数据来源", current?.source ?? "—"],
-                ["坐标系", cloud ? "相机系" : "—"],
-                [
-                  "标定状态",
-                  state.calibration?.has_calib ? "已标定" : "未标定",
-                ],
-              ].map(([label, value], index) => (
-                <div className={styles.infoCell} key={label} title={label === "点云数量" ? cloudSummary : value}>
-                  <span>{label}</span>
-                  <strong className={index === 2 ? styles.number : ""}>
-                    {value}
-                  </strong>
-                </div>
-              ))}
-            </div>
-          </section>
-          <section
-            className={`${styles.panel} ${styles.taskPanel} ${folded.task ? styles.folded : ""}`}
-          >
-            <button
-              className={styles.panelHeading}
-              aria-label="折叠或展开采集任务"
-              aria-expanded={!folded.task}
-              onClick={() => toggle("task")}
-            >
-              <Sprite
-                x={1241}
-                y={378}
-                w={141}
-                h={30}
-                style={{ position: "absolute", left: 15, top: 10 }}
-              />
-              {folded.task ? <ChevronDown /> : <ChevronUp />}
-            </button>
-            <div className={styles.taskBody} hidden={folded.task}>
-              <div
-                className={styles.progress}
-                role="progressbar"
-                aria-label="采集任务状态"
-                aria-valuetext={busy ? "任务运行中，等待后端状态" : "空闲"}
-              >
-                <span className={busy ? styles.indeterminate : ""} />
-                <strong>{busy ? "运行中" : "空闲"}</strong>
-              </div>
-              <div className={styles.mutex}>
-                <span>✓</span>
-                <strong>采集与识别任务互斥</strong>
-              </div>
-              <button
-                className={styles.startButton}
-                disabled={busy || pending}
-                onClick={startScan}
-              >
-                <Play size={18} fill="currentColor" />
-                {busy ? "采集进行中" : "开始采集"}
-              </button>
-              {state.pollError && (
-                <button
-                  className={styles.pollRetry}
-                  onClick={store.retryPolling}
-                >
-                  连接中断，重新检查任务
-                </button>
-              )}
-            </div>
-          </section>
-          <section
-            className={`${styles.panel} ${styles.logPanel} ${folded.logs ? styles.folded : ""}`}
-          >
-            <div className={styles.panelHeading}>
-              <button
-                className={styles.logTitle}
-                aria-label="折叠或展开任务日志"
-                aria-expanded={!folded.logs}
-                onClick={() => toggle("logs")}
-              >
-                <Sprite x={1241} y={602} w={141} h={31} />
-              </button>
-              <div className={styles.logFilter}>
-                <button
-                  aria-label="筛选任务日志"
-                  aria-expanded={logMenu}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setLogMenu(!logMenu);
-                  }}
-                >
-                  {
-                    {
-                      all: "全部",
-                      scan: "采集",
-                      error: "错误",
-                      upload: "上传",
-                    }[logKind]
-                  }
-                  <ChevronDown size={15} />
-                </button>
-                {logMenu && (
-                  <div
-                    className={styles.menu}
-                    onPointerDown={(event) => event.stopPropagation()}
-                  >
-                    {(["all", "scan", "error", "upload"] as const).map(
-                      (kind) => (
-                        <button
-                          key={kind}
-                          onClick={() => {
-                            setLogKind(kind);
-                            setLogMenu(false);
-                          }}
-                        >
-                          {
-                            {
-                              all: "全部",
-                              scan: "采集",
-                              error: "错误",
-                              upload: "上传",
-                            }[kind]
-                          }
-                        </button>
-                      ),
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-            <div
-              className={styles.logs}
-              hidden={folded.logs}
-              aria-live="polite"
-            >
-              {logs.length ? (
-                logs.map((log) => <LogRow key={log.id} log={log} />)
-              ) : (
-                <div className={styles.emptyLog}>
-                  <Info size={20} />
-                  <span>
-                    {logKind === "all" ? "当前无采集任务" : "没有匹配的日志"}
-                  </span>
-                </div>
-              )}
-            </div>
-          </section>
-  </>;
   return (
     <div
       ref={outer}
@@ -499,16 +297,11 @@ export default function AcquisitionPage({
     >
       <div
         className={styles.stage}
-        style={compact ? { gridTemplateColumns: "232px minmax(602px, 1fr)", gridTemplateRows: "76px minmax(0, 1fr) 44px", overflowX: "auto" } : undefined}
+        style={{ gridTemplateColumns: compact ? "232px minmax(0, 1fr)" : "320px minmax(0, 1fr)", gridTemplateRows: "76px minmax(0, 1fr)" }}
         data-acquisition-stage
       >
         <div className="app-header-space" aria-hidden="true" />
         <div className={styles.leftColumn} style={compact ? { gridColumn: 1, gridRow: 2 } : undefined}>
-          {compact && <div className={styles.colorButtons}>
-            <button className={compactPanel === "workflow" ? styles.active : ""} onClick={() => setCompactPanel("workflow")}>工作流</button>
-            <button className={compactPanel === "context" ? styles.active : ""} onClick={() => setCompactPanel("context")}>焊缝与上下文</button>
-          </div>}
-          {(!compact || compactPanel === "workflow") && <>
           <section
             className={`${styles.panel} ${styles.dataPanel} ${folded.data ? styles.folded : ""}`}
           >
@@ -528,84 +321,6 @@ export default function AcquisitionPage({
               {folded.data ? <ChevronDown /> : <ChevronUp />}
             </button>
             <div hidden={folded.data} className={styles.dataBody}>
-              <div className={styles.uploadGroup} ref={menu}>
-                <button
-                  className={styles.uploadMain}
-                  aria-label="上传 PCD 文件"
-                  disabled={pending}
-                  onClick={() => fileInput.current?.click()}
-                  style={{ backgroundPosition: "-45px -141px" }}
-                >
-                  <CloudUpload size={20} /><span>上传 PCD 文件</span>
-                </button>
-                <button
-                  className={styles.uploadArrow}
-                  aria-label="更多点云操作"
-                  aria-expanded={uploadMenu}
-                  onClick={() => setUploadMenu(!uploadMenu)}
-                  style={{ backgroundPosition: "-335px -141px" }}
-                >
-                  <ChevronDown size={16} />
-                </button>
-                {uploadMenu && (
-                  <div className={styles.menu}>
-                    <button onClick={() => fileInput.current?.click()}>
-                      <CloudUpload />
-                      上传 PCD 文件
-                    </button>
-                    <button onClick={saveCloud} disabled={!cloud}>
-                      <Download />
-                      导出当前视图 (.pcd)
-                    </button>
-                    <button
-                      onClick={() => {
-                        setUploadMenu(false);
-                        void store.restoreWorkspaceFrames();
-                      }}
-                    >
-                      <RefreshCcw />
-                      恢复 / 刷新帧列表
-                    </button>
-                  </div>
-                )}
-              </div>
-              <input
-                ref={fileInput}
-                type="file"
-                accept=".pcd"
-                multiple
-                hidden
-                aria-label="选择 PCD 文件"
-                onChange={(event) => {
-                  void upload(event.target.files);
-                  event.target.value = "";
-                }}
-              />
-              <Sprite
-                x={94}
-                y={189}
-                w={265}
-                h={20}
-                style={{ position: "absolute", left: 63, top: 46 }}
-              />
-              <div className={styles.loadedFile}>
-                <FolderOpen size={20} />
-                <span>已载入点云：</span>
-                <strong title={filename(state.frame)}>
-                  {filename(state.frame)}
-                </strong>
-                <button
-                  aria-label="卸载当前点云"
-                  disabled={!state.frame || pending}
-                  title="卸载视图，保留帧列表"
-                  onClick={() => {
-                    store.unloadFrame();
-                    setMeasurement(null);
-                  }}
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
               <div className={styles.frameListHeading}>
                 <strong>帧列表（{state.frames.length}）</strong>
                 <button
@@ -710,18 +425,12 @@ export default function AcquisitionPage({
                     </button>
                     <button
                       className={styles.eyeButton}
-                      aria-label={`${hidden && state.frame === frame.id ? "显示" : "查看或隐藏"} ${frame.id}`}
-                      title={
-                        state.frame === frame.id
-                          ? "显示 / 隐藏当前点云"
-                          : "载入并查看此帧"
-                      }
-                      onClick={() => {
-                        if (state.frame === frame.id) setHidden(!hidden);
-                        else void selectFrame(frame.id);
-                      }}
+                      aria-label={`删除帧 ${frame.id}`}
+                      title="从工作区删除此帧"
+                      disabled={busy || pending}
+                      onClick={() => void store.removeFramesFromWorkspace([frame.id])}
                     >
-                      <EyeIcon hidden={hidden && state.frame === frame.id} />
+                      <Trash2 size={18} />
                     </button>
                     <span className={styles.srOnly}>{index + 1}</span>
                   </div>
@@ -733,6 +442,86 @@ export default function AcquisitionPage({
                 )}
               </div>
             </div>
+          </section>
+          <section className={`${styles.panel} ${styles.importPanel}`} aria-label="导入点云文件">
+              <div className={styles.uploadGroup} ref={menu}>
+                <button
+                  className={styles.uploadMain}
+                  aria-label="上传 PCD 文件"
+                  disabled={pending}
+                  onClick={() => fileInput.current?.click()}
+                  style={{ backgroundPosition: "-45px -141px" }}
+                >
+                  <CloudUpload size={20} /><span>上传 PCD 文件</span>
+                </button>
+                <button
+                  className={styles.uploadArrow}
+                  aria-label="更多点云操作"
+                  aria-expanded={uploadMenu}
+                  onClick={() => setUploadMenu(!uploadMenu)}
+                  style={{ backgroundPosition: "-335px -141px" }}
+                >
+                  <ChevronDown size={16} />
+                </button>
+                {uploadMenu && (
+                  <div className={styles.menu}>
+                    <button onClick={() => fileInput.current?.click()}>
+                      <CloudUpload />
+                      上传 PCD 文件
+                    </button>
+                    <button onClick={saveCloud} disabled={!cloud}>
+                      <Download />
+                      导出当前视图 (.pcd)
+                    </button>
+                    <button
+                      onClick={() => {
+                        setUploadMenu(false);
+                        void store.restoreWorkspaceFrames();
+                      }}
+                    >
+                      <RefreshCcw />
+                      恢复 / 刷新帧列表
+                    </button>
+                  </div>
+                )}
+              </div>
+              <input
+                ref={fileInput}
+                type="file"
+                accept=".pcd"
+                multiple
+                hidden
+                aria-label="选择 PCD 文件"
+                onChange={(event) => {
+                  void upload(event.target.files);
+                  event.target.value = "";
+                }}
+              />
+              <Sprite
+                x={94}
+                y={189}
+                w={265}
+                h={20}
+                style={{ position: "absolute", left: 63, top: 46 }}
+              />
+              <div className={styles.loadedFile}>
+                <FolderOpen size={20} />
+                <span>已载入点云：</span>
+                <strong title={filename(state.frame)}>
+                  {filename(state.frame)}
+                </strong>
+                <button
+                  aria-label="卸载当前点云"
+                  disabled={!state.frame || pending}
+                  title="卸载视图，保留帧列表"
+                  onClick={() => {
+                    store.unloadFrame();
+                    setMeasurement(null);
+                  }}
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
           </section>
           <section
             className={`${styles.panel} ${styles.scanSettings} ${folded.parameters ? styles.folded : ""}`}
@@ -859,8 +648,8 @@ export default function AcquisitionPage({
               </button>
             </form>
           </section>
-          </>}
-          {compact && compactPanel === "context" && contextPanels}
+
+
         </div>
         <section
           ref={viewport}
@@ -871,45 +660,6 @@ export default function AcquisitionPage({
             <Sprite x={417} y={109} w={255} h={29} />
           </div>
           <div className={styles.viewToolbar}>
-            <div className={styles.colorButtons}>
-              <button
-                className={colorMode === "semantic" ? styles.active : ""}
-                onClick={() => setColorMode("semantic")}
-                aria-pressed={colorMode === "semantic"}
-              >
-                <svg width="16" height="16" viewBox="0 0 18 18">
-                  <path
-                    d="m9 2 6 3.5v7L9 16l-6-3.5v-7Z"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.6"
-                  />
-                  <circle
-                    cx="9"
-                    cy="9"
-                    r="2.7"
-                    fill="none"
-                    stroke="currentColor"
-                  />
-                </svg>
-                语义
-              </button>
-              <button
-                className={colorMode === "instance" ? styles.active : ""}
-                onClick={() => {
-                  setColorMode("instance");
-                  if (cloud?.header.n_instances === 0)
-                    store.notify(
-                      "当前 PCD 不含实例编号，实例视图显示未分配背景",
-                      "info",
-                    );
-                }}
-                aria-pressed={colorMode === "instance"}
-              >
-                <Box size={16} />
-                实例
-              </button>
-            </div>
             <div className={styles.pointControl}>
               <label htmlFor="acquisition-point-size">点大小</label>
               <input
@@ -955,7 +705,7 @@ export default function AcquisitionPage({
             </button>
           </div>
           <div className={styles.cloudLayer} role="group" aria-label={cloudSummary}>
-            <ProcessPresentation stage={1} light={light} active={active} />
+            <ProcessPresentation stage={1} light={light} active={active} pointSize={pointSize} />
             {cloud && !state.loading ? (
               <CloudViewport
                 ref={cloudRef}
@@ -1072,109 +822,6 @@ export default function AcquisitionPage({
             </div>
           )}
         </section>
-        {!compact && <aside className={styles.rightColumn}>{contextPanels}</aside>}
-        <footer className={styles.footer} style={compact ? { gridColumn: "1 / -1", gridRow: 3 } : undefined}>
-          <button
-            className={styles.footerTitle}
-            aria-expanded={drawer !== null}
-            onClick={() => setDrawer(drawer ? null : "current")}
-          >
-            <ChevronsDown size={24} />
-            <strong>任务中心（{drawer ? "已展开" : "已折叠"}）</strong>
-          </button>
-          <span className={styles.nativeFooterMode}>{mode === "demo" ? "浏览器演示 · 所有数据为模拟，不连接真实设备" : "后端模式 · 连接既有 FastAPI 服务"}</span>
-          <div className={styles.footerRight}>
-            <button onClick={() => setDrawer("current")}>
-              <Play size={17} />
-              运行任务 <span>{busy ? 1 : 0}</span>
-            </button>
-            <i />
-            <button onClick={() => setDrawer("history")}>
-              <History size={18} />
-              会话历史
-            </button>
-            <button
-              className={styles.footerArrow}
-              aria-label="展开或收起任务中心"
-              onClick={() => setDrawer(drawer ? null : "history")}
-            >
-              {drawer ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-            </button>
-          </div>
-          {drawer && (
-            <div className={styles.taskDrawer}>
-              <div className={styles.drawerHeading}>
-                <strong>
-                  {drawer === "current" ? "当前任务" : "会话任务历史"}
-                </strong>
-                <button
-                  onClick={() =>
-                    setDrawer(drawer === "current" ? "history" : "current")
-                  }
-                >
-                  {drawer === "current" ? "查看历史" : "返回当前任务"}
-                </button>
-                <span>采集与识别任务不提供取消接口</span>
-                <button
-                  aria-label="关闭任务中心"
-                  onClick={() => setDrawer(null)}
-                >
-                  <X size={18} />
-                </button>
-              </div>
-              <div className={styles.drawerBody}>
-                <div className={styles.historyList}>
-                  {state.history.map((task) => (
-                    <button
-                      key={task.id}
-                      className={
-                        selectedTask?.id === task.id ? styles.activeHistory : ""
-                      }
-                      onClick={() => setHistoryId(task.id)}
-                    >
-                      <span>
-                        {task.kind === "scan" ? "相机采集" : "焊缝识别"}
-                      </span>
-                      <small>
-                        {task.createdAt} ·{" "}
-                        {
-                          {
-                            submitting: "提交中",
-                            queued: "等待中",
-                            running: "运行中",
-                            done: "完成",
-                            error: "失败",
-                          }[task.state]
-                        }
-                      </small>
-                    </button>
-                  ))}
-                  {!state.history.length && <span>当前会话暂无任务</span>}
-                </div>
-                <div className={styles.terminal}>
-                  {selectedTask ? (
-                    <>
-                      <strong>{selectedTask.id}</strong>
-                      {selectedTask.log.map((line, index) => (
-                        <p key={index}>
-                          {String(index + 1).padStart(2, "0")}　{line}
-                        </p>
-                      ))}
-                      {selectedTask.error && (
-                        <p className={styles.errorText}>{selectedTask.error}</p>
-                      )}
-                      {state.pollError && (
-                        <p className={styles.errorText}>{state.pollError}</p>
-                      )}
-                    </>
-                  ) : (
-                    <p>开始采集后在这里查看过程日志。</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-        </footer>
         {state.toast && (
           <div className={styles.toast} role="status">
             <Info size={18} />
@@ -1302,15 +949,7 @@ export default function AcquisitionPage({
                   <p>
                     当前为本地会话。此版本没有账号认证后端，不会伪造登录状态。文件与任务记录保留在当前浏览器会话中。
                   </p>
-                  <button
-                    className={styles.dialogRefresh}
-                    onClick={() => {
-                      setDrawer("history");
-                      setDialog(null);
-                    }}
-                  >
-                    查看当前会话历史
-                  </button>
+
                 </>
               )}
             </div>
@@ -1320,23 +959,3 @@ export default function AcquisitionPage({
     </div>
   );
 }
-function LogRow({ log }: { log: LogEntry }) {
-  return (
-    <div className={styles.logRow}>
-      <i
-        className={
-          log.kind === "error"
-            ? styles.red
-            : log.kind === "warn"
-              ? styles.yellow
-              : log.kind === "ok"
-                ? styles.green
-                : styles.blue
-        }
-      />
-      <time>{log.time}</time>
-      <span>{log.text}</span>
-    </div>
-  );
-}
-

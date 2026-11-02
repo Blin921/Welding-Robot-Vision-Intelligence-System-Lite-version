@@ -30,7 +30,7 @@ export default function SampleLab() {
       if (document.hidden) { last = 0; frame = requestAnimationFrame(tick); return; }
       if (!last) last = time;
       if (time - lastCommit >= 40) {
-        const delta = Math.min(0.25, (time - last) / 1000) * speed / stage.duration;
+        const delta = Math.min(0.25, (time - last) / 1000) * speed * 1.5 / stage.duration;
         setProgress(previous => Math.min(1, previous + delta));last = time;lastCommit = time;
       }
       frame = requestAnimationFrame(tick);

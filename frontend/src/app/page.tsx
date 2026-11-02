@@ -32,7 +32,7 @@ import WorkflowControls, {
 } from "../components/WorkflowControls";
 import WorkspaceViewport from "../components/WorkspaceViewport";
 import ContextPanels from "../components/ContextPanels";
-import TaskCenter from "../components/TaskCenter";
+
 import { useCompact } from "../components/useCompact";
 import AcquisitionPage from "../components/acquisition/AcquisitionPage";
 import PdfStage from "../components/PdfStage";
@@ -80,7 +80,7 @@ function Workspace({
   }), [mode]);
   const [tab, setTab] = useState(1),
     [light, setLight] = useState(true),
-    [taskOpen, setTaskOpen] = useState(false),
+
     [dialog, setDialog] = useState<Dialog>(null),
     [forms, setForms] = useState<Forms>(() => ({
       ...calibrationDefaults,
@@ -89,6 +89,12 @@ function Workspace({
     [compactPanel, setCompactPanel] = useState<"workflow" | "context">(
       "workflow",
     );
+  const recognitionOpened = useRef(false);
+  useEffect(() => {
+    if (tab !== 2 || recognitionOpened.current || !state.frame || state.loading || state.activeTask || state.pending) return;
+    recognitionOpened.current = true;
+    store.resetRecognition();
+  }, [tab, state.frame, state.loading, state.activeTask, state.pending, store]);
   const toggleTheme = useCallback(() => {
     setLight(previous => {
       const next = !previous;
@@ -163,7 +169,7 @@ function Workspace({
     return () => clearTimeout(timer);
   }, [state.toast, store]);
   const go = (next: number) => {
-    setTab(next);
+    setTab(next === 6 ? 5 : next);
     setCompactPanel("workflow");
   };
   const setAndRememberForms: typeof setForms = (update) => {
@@ -273,7 +279,7 @@ function Workspace({
         Number.isFinite(forms.recognize.min_len) ? forms.recognize.min_len : 0
       }
       onAction={seamAction}
-      onTaskOpen={() => setTaskOpen(true)}
+      onTaskOpen={() => {}}
       onNavigate={go}
       calibrationMode={effectiveForms.calibMode}
       pairCount={effectiveForms.pairs.length}
@@ -309,10 +315,10 @@ function Workspace({
           <>
             <main
               className={`workspace page-${tab} ${compact ? "compact" : ""}`}
-              style={compact ? { gridTemplateColumns: "232px minmax(602px, 1fr)", gridTemplateRows: "minmax(0, 1fr)", overflowX: "auto" } : undefined}
+              style={tab === 2 || tab === 5 ? { gridTemplateColumns: compact ? "232px minmax(0, 1fr)" : "320px minmax(0, 1fr)" } : compact ? { gridTemplateColumns: "232px minmax(602px, 1fr)", gridTemplateRows: "minmax(0, 1fr)", overflowX: "auto" } : undefined}
             >
               <aside className="left-column" ref={leftColumn} style={compact ? { gridColumn: 1, gridRow: 1 } : undefined}>
-                {compact && (
+                {compact && tab !== 2 && tab !== 5 && (
                   <div className="segmented context-tabs">
                     <button
                       className={compactPanel === "workflow" ? "active" : ""}
@@ -328,7 +334,7 @@ function Workspace({
                     </button>
                   </div>
                 )}
-                {!compact || compactPanel === "workflow" ? (
+                {tab === 2 || tab === 5 || !compact || compactPanel === "workflow" ? (
                   <>
                     <WorkflowControls
                       tab={tab}
@@ -338,6 +344,7 @@ function Workspace({
                       onPush={push}
                       onSeamAction={seamAction}
                     />
+                    {tab === 2 && context}
                     <div className="sidebar-foot">
                       <ShieldCheck size={15} />
                       <span>
@@ -361,7 +368,7 @@ function Workspace({
                   }
                 />
               </section>
-              {!compact && (
+              {!compact && tab !== 2 && tab !== 5 && tab !== 5 && (
                 <aside className="right-column" ref={rightColumn}>
                   {context}
                 </aside>
@@ -369,7 +376,7 @@ function Workspace({
             </main>
           </>
         )}
-        <TaskCenter open={taskOpen} setOpen={setTaskOpen} />
+
         {state.toast && (
           <div className={`toast toast-${state.toast.kind}`} role="status">
             <CircleHelp size={18} />

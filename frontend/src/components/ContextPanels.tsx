@@ -294,6 +294,18 @@ export default function ContextPanels({
         </Panel>
       </>
     );
+  if (tab === 2) return <>
+    <Panel title="识别结果" icon={<Activity />}>
+      <div className="stats recognition-stats">
+        <div><small>焊缝数量</small><strong>{state.recognitionReady ? state.seams.length : "—"}</strong></div>
+        <div><small>点云总数</small><strong>{state.recognitionReady ? cloud?.header.n.toLocaleString() ?? "—" : "—"}</strong></div>
+        <div><small>实例数</small><strong>{state.recognitionReady ? cloud?.header.n_instances ?? "—" : "—"}</strong></div>
+      </div>
+    </Panel>
+    <Panel title="焊缝列表" icon={<Layers3 />}>
+      <SeamList compact hideActions minLength={minLength} onAction={onAction} />
+    </Panel>
+  </>;
   return (
     <>
       {tab === 2 && (
@@ -301,15 +313,15 @@ export default function ContextPanels({
           <div className="stats recognition-stats">
             <div>
               <small>焊缝数量</small>
-              <strong>{state.seams.length}</strong>
+              <strong>{state.recognitionReady ? state.seams.length : "—"}</strong>
             </div>
             <div>
               <small>点云总数</small>
-              <strong>{cloud?.header.n.toLocaleString() ?? "—"}</strong>
+              <strong>{state.recognitionReady ? cloud?.header.n.toLocaleString() ?? "—" : "—"}</strong>
             </div>
             <div>
               <small>实例数</small>
-              <strong>{cloud?.header.n_instances ?? "—"}</strong>
+              <strong>{state.recognitionReady ? cloud?.header.n_instances ?? "—" : "—"}</strong>
             </div>
           </div>
         </Panel>

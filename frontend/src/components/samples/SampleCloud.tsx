@@ -44,7 +44,8 @@ export default function SampleCloud(props: Props) {
       void main(){if(length(gl_PointCoord-0.5)>0.5)discard;vec3 c=vColor;float alpha=0.82;
       if(uKind>0.5&&uKind<1.5){float edge=-260.0+uProgress*830.0;if(vZ>edge){c=mix(vec3(0.30,0.39,0.46),c,0.08);alpha=0.10;}else if(abs(vZ-edge)<18.0)c=mix(c,vec3(0.18,0.96,1.0),0.85);}
       if(uKind>1.5&&uKind<2.5){float reveal=smoothstep(0.2,0.75,uProgress);c=mix(vec3(0.45,0.55,0.61),c,reveal);}
-      c=mix(c,c*0.82,uLight);gl_FragColor=vec4(c,alpha);}`,
+      c=mix(c,c*0.82,uLight);
+      gl_FragColor=vec4(c,alpha);}`,
     });
     root.add(new THREE.Points(geometry, material));
     const grid = new THREE.GridHelper(1200, 60, 0x3b6474, 0x29404c); grid.position.set(300, -220, 150); grid.material.transparent = true; grid.material.opacity = 0.24; scene.add(grid);
@@ -71,6 +72,12 @@ export default function SampleCloud(props: Props) {
     const seamLines:THREE.Line[]=[];
     seams.forEach((seam,index)=>{const g=new THREE.BufferGeometry().setFromPoints(seam.trajectory_mm.map(p=>new THREE.Vector3(...p)));const line=new THREE.Line(g,new THREE.LineBasicMaterial({color:index===0?0xffb14d:0x54d9cf,transparent:true,opacity:index===0?1:0.6,depthTest:false}));line.renderOrder=5;seamGroup.add(line);seamLines.push(line);
       for(const p of [seam.trajectory_mm[0],seam.trajectory_mm.at(-1)!]){const dot=new THREE.Mesh(new THREE.SphereGeometry(index===0?5:3,12,8),new THREE.MeshBasicMaterial({color:index===0?0xffd68d:0x7ee7de,depthTest:false}));dot.position.set(...p);dot.renderOrder=6;seamGroup.add(dot);}});
+    // Solid tubes give extracted seams a visible thickness on every WebGL platform.
+    const extractedSeams = seams.map((seam, index) => {
+      const curve = new THREE.CatmullRomCurve3(seam.trajectory_mm.map(point => new THREE.Vector3(...point)));
+      const mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 80, index === 0 ? 3.2 : 2.5, 8, false), new THREE.MeshBasicMaterial({ color: 0xc34408, depthTest: false, depthWrite: false }));
+      mesh.renderOrder = 8; mesh.visible = false; root.add(mesh); return mesh;
+    });
     const weldPath=seams[0].trajectory_mm;
     const tube=new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(weldPath.map(p=>new THREE.Vector3(...p))),40,2.4,8,false),new THREE.MeshBasicMaterial({color:0xffae43,transparent:true,opacity:0.9,depthTest:false}));tube.renderOrder=6;root.add(tube);
     const torch=new THREE.Group();torch.scale.setScalar(3);torch.rotation.x=-Math.PI/2;
@@ -82,20 +89,31 @@ export default function SampleCloud(props: Props) {
     const display=new THREE.Mesh(new THREE.PlaneGeometry(62,48),new THREE.MeshBasicMaterial({color:0x58e0c7}));display.position.set(820,90,231);transfer.add(display);
     const packets:THREE.Mesh[]=[];for(let i=0;i<7;i++){const packet=new THREE.Mesh(new THREE.BoxGeometry(13,13,13),new THREE.MeshBasicMaterial({color:i%2?0xffb05b:0x63e4d4}));transfer.add(packet);packets.push(packet);}
     let width=0,height=0,visible=true;
-    const resize=()=>{width=el.clientWidth;height=el.clientHeight;visible=width>0&&height>0;if(!visible)return;renderer.setSize(width,height);camera.aspect=width/height;camera.updateProjectionMatrix();renderer.render(scene,camera);};
+    const resize=()=>{width=el.clientWidth;height=el.clientHeight;visible=width>0&&height>0;if(!visible)return;renderer.setSize(width,height);camera.aspect=width/height;camera.setViewOffset(width,height,0,height*0.10,width,height);camera.updateProjectionMatrix();renderer.render(scene,camera);};
     const observer=new ResizeObserver(resize);observer.observe(el);resize();
     let raf=0;
     const draw=(time:number)=>{raf=requestAnimationFrame(draw);if(document.hidden||!visible)return;
       const p=latest.current;let t=p.progress;let phase=KINDS.indexOf(p.kind);
       if(phase===0){const step=Math.min(3,Math.floor(t*4));const part=t>=1?1:t*4-step;phase=[1,part<0.5?2:3,5,6][step];t=step===1?(part<0.5?part*2:(part-0.5)*2):part;}
       material.uniforms.uProgress.value=t;material.uniforms.uKind.value=phase;material.uniforms.uSize.value=p.pointSize;material.uniforms.uLight.value=p.light?1:0;
+      const contrastRecognition=p.light&&phase===2;
+      recognitionBoxes.children.forEach((box,i)=>{const helper=box as THREE.Box3Helper; const materials=Array.isArray(helper.material)?helper.material:[helper.material];for(const m of materials){(m as THREE.LineBasicMaterial).color.setHex((contrastRecognition?[0x1754b8,0x087b43,0xbc490e]:[0x65d6ff,0x6bf0b2,0xffb16c])[i]);m.opacity=contrastRecognition?0.95:0.55;}});
+      seamLines.forEach((line,i)=>{const m=line.material as THREE.LineBasicMaterial;m.color.setHex(contrastRecognition?(i===0?0xc34408:0x006d73):(i===0?0xffb14d:0x54d9cf));m.opacity=contrastRecognition?1:(i===0?1:0.6);});
+      extractedSeams.forEach((mesh,i)=>{
+        mesh.visible=phase===2&&t>=0.75;
+        mesh.material.color.setHex(p.light?(i===0?0xb52e06:0x00515e):(i===0?0xffa126:0x45f4de));
+        const reveal=Math.max(0,Math.min(1,(t-0.75)*4-i*0.10));
+        mesh.geometry.setDrawRange(0,Math.floor(reveal*80)*8*6);
+      });
+      let endpointIndex=0;
+      seamGroup.children.forEach(child=>{if(child instanceof THREE.Mesh){const selected=endpointIndex++<2;child.scale.setScalar(phase===2?1.5:1);(child.material as THREE.MeshBasicMaterial).color.setHex(contrastRecognition?(selected?0xb83a08:0x00646b):(selected?0xffd68d:0x7ee7de));}});
       grid.visible=p.grid;grid.material.opacity=p.light?0.13:0.23;
       sweep.visible=phase===1||phase===0;sweep.position.z=-250+t*800;
       recognitionBoxes.visible=phase===2&&t>0.2;recognitionBoxes.children.forEach((b,i)=>{b.visible=t>(0.2+i*0.17);});
       correspondence.visible=phase===3;correspondence.children.forEach((c,i)=>{c.visible=i>=9||t>(Math.floor(i/3)*0.15);});baseAxes.rotation.z=(1-Math.min(1,t*1.25))*0.7;baseAxes.rotation.x=(1-t)*0.35;
       if(phase===3){const offset=1-THREE.MathUtils.smoothstep(t,0.25,0.9);for(let i=0;i<3;i++){const first=correspondence.children[i*3],second=correspondence.children[i*3+1],line=correspondence.children[i*3+2] as THREE.Line;second.position.copy(first.position).add(new THREE.Vector3(80,-95,20).multiplyScalar(offset));const attr=line.geometry.getAttribute("position") as THREE.BufferAttribute;attr.setXYZ(1,second.position.x,second.position.y,second.position.z);attr.needsUpdate=true;line.computeLineDistances();}}
-      seamGroup.visible=phase!==1||t>0.94;
-      seamLines.forEach((line,i)=>{line.geometry.setDrawRange(0,phase===4?Math.max(0,Math.ceil((t*1.5-i*0.13)*weldPath.length)):weldPath.length);});
+      seamGroup.visible=phase===2?t>=0.75:phase!==1||t>0.94;
+      seamLines.forEach((line,i)=>{line.geometry.setDrawRange(0,phase===2?Math.max(0,Math.ceil(((t-0.75)*4-i*0.10)*weldPath.length)):phase===4?Math.max(0,Math.ceil((t*1.5-i*0.13)*weldPath.length)):weldPath.length);});
       tube.visible=phase===5||phase===4&&t>0.75;tube.geometry.setDrawRange(0,Math.floor(t*40)*8*6);
       torch.visible=phase===5&&t>0.12;contact.visible=torch.visible;
       const at=Math.max(0,Math.min(1,(t-0.12)/0.88));const z=-135+570*at;torch.position.set(weldPath[0][0],weldPath[0][1],z);contact.position.copy(torch.position);contact.scale.setScalar(1+Math.sin(time*0.008)*0.14);

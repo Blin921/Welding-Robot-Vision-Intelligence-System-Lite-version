@@ -1666,3 +1666,25 @@
 
 /* Match the shared application shell inset, including narrow displays. */
 .stage { padding: 10px 12px; }
+
+/* Point cloud modeling: controls and an expanded viewport. */
+.leftColumn { overflow: auto; }
+.dataBody { grid-template-rows: 22px minmax(140px, 1fr) 34px 16px 30px; }
+.dataBody > .sprite { margin: 0; }
+.viewport { grid-column: 2; grid-row: 2; }
+
+/* Separate file imports from the frame list. */
+.dataBody { grid-template-rows: 22px minmax(140px, 1fr); }
+.importPanel { flex: 0 0 auto; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: linear-gradient(120deg, #dce5e7, #dfe6e8); overflow: visible; }
+.importPanel > .sprite { position: static !important; width: 100% !important; height: 16px !important; font-size: 12px; }
+.importPanel .loadedFile { min-height: 30px; }
+.dark .importPanel { background: var(--panel); }
+/* Keep the preview heading, tools and animation together. */
+.viewportHeading { height: 44px; }
+.viewToolbar { top: 6px; left: 245px; right: 12px; flex-wrap: nowrap; }
+.cloudLayer { top: 48px; }
+.cloudLayer > :global(.process-launch) { top: 12px; bottom: auto; }
+@media (max-width: 1000px) {
+  .viewToolbar { left: 12px; top: 42px; }
+  .cloudLayer { top: 82px; }
+}

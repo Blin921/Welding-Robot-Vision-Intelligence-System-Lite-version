@@ -4,7 +4,7 @@ export default function BrandMark() {
   return (
     <Image
       className="brand-symbol"
-      src="/brand/smart-vision.png"
+      src="/brand/vision-welding-logo.png"
       alt=""
       width={68}
       height={68}
