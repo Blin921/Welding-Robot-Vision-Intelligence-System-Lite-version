@@ -1,0 +1,36 @@
+{
+  "name": "weld-vision-frontend",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -H 0.0.0.0",
+    "build": "next build",
+    "start": "node scripts/start-production.cjs",
+    "typecheck": "tsc --noEmit",
+    "test:ui": "node scripts/screenshot-regression.cjs",
+    "lint": "eslint . --max-warnings 0",
+    "test": "vitest run",
+    "format": "prettier --write src scripts *.ts *.mjs *.json README.md",
+    "postbuild": "node scripts/prepare-runtime.cjs",
+    "test:performance": "node scripts/performance-check.cjs"
+  },
+  "dependencies": {
+    "lucide-react": "0.468.0",
+    "next": "16.4.3",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "three": "0.180.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56",
+    "@types/node": "^24",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/three": "^0.180.0",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.4.3",
+    "prettier": "^3.9.10",
+    "typescript": "^5.9",
+    "vitest": "^5.0.5"
+  }
+}

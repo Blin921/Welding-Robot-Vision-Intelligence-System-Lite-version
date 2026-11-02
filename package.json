@@ -1,0 +1,16 @@
+{
+  "name": "weld-vision",
+  "version": "0.3.0",
+  "private": true,
+  "scripts": {
+    "predev": "node frontend/scripts/ensure-dependencies.cjs",
+    "dev": "npm --prefix frontend run dev --",
+    "prebuild": "node frontend/scripts/ensure-dependencies.cjs",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix frontend run start --",
+    "lint": "npm --prefix frontend run lint",
+    "typecheck": "npm --prefix frontend run typecheck",
+    "test": "npm --prefix frontend test"
+  },
+  "engines": { "node": ">=24" }
+}

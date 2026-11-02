@@ -1,0 +1,966 @@
+/* PDF module positions and palette. PointCloud's render loop and materials are unchanged. */
+.pdf-stage {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: 1680px;
+  height: 944px;
+  transform-origin: center;
+}
+.pdf-app.app {
+  width: 1680px;
+  height: 944px;
+  min-width: 0;
+  min-height: 0;
+  padding: 12px 22px 22px;
+  gap: 16px;
+  overflow: hidden;
+  font:
+    16px Arial,
+    "Microsoft YaHei",
+    "Noto Sans CJK SC",
+    sans-serif;
+}
+.pdf-app.app.light {
+  --bg: #d3dbde;
+  --panel: #dce5e7;
+  --panel-deep: #d6e0e2;
+  --text: #243540;
+  --muted: #71838d;
+  --border: #bfccd1;
+  --input: #e8eeee;
+  --soft: #dce5e7;
+  --heading: #d7e0e2;
+  --orange: #e65d12;
+  --orange-bg: #eddfd6;
+  background: linear-gradient(117deg, #d3dee1, #ccd7db 54%, #d9e3e5);
+}
+.pdf-app .topbar {
+  height: 70px;
+  min-height: 70px;
+  width: 100%;
+  padding: 0 24px;
+  gap: 12px;
+  border-radius: 11px;
+}
+.pdf-app.light .topbar {
+  background: linear-gradient(105deg, #e6eded, #e2e9eb);
+  border-color: #eef3f3;
+}
+.pdf-app .brand {
+  width: 230px;
+  min-width: 230px;
+  font-size: 23px;
+  letter-spacing: 0;
+  gap: 12px;
+}
+.pdf-app .brand-symbol {
+  width: 43px;
+  height: 43px;
+}
+.pdf-app .topbar nav {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  gap: 4px;
+  margin: 0;
+  height: 100%;
+}
+.pdf-app .topbar nav > button {
+  display: flex;
+  flex-direction: row;
+  padding: 0 9px;
+  font-size: 15px;
+  gap: 8px;
+  white-space: nowrap;
+}
+.pdf-app .topbar nav > button span {
+  display: inline;
+}
+.pdf-app .topbar nav > button.active {
+  color: #e65d12;
+}
+.pdf-app .topbar nav > button.active:after {
+  background: #ef6014;
+  bottom: 13px;
+  height: 3px;
+}
+.pdf-app .health {
+  display: flex;
+  gap: 5px;
+  margin-left: 8px;
+  font-size: 13px;
+}
+.pdf-app .health > span {
+  height: 36px;
+  padding: 0 8px;
+  border: 1px solid #cad6da;
+  border-radius: 5px;
+  gap: 6px;
+  white-space: nowrap;
+  background: #e4ecef80;
+}
+.pdf-app .health-calibration-label,
+.pdf-app .health-long {
+  display: inline;
+}
+.pdf-app .health > button {
+  display: none;
+}
+.pdf-app .header-tools {
+  display: flex;
+  gap: 13px;
+}
+.pdf-app .header-tools .demo-tag {
+  height: 36px;
+  font-size: 14px;
+  padding: 0 11px;
+  border: 1px solid #cad6da;
+  color: #4d626e;
+  background: #dbe4e7;
+}
+.pdf-app .header-tools .demo-tag svg {
+  display: none;
+}
+.pdf-app .header-tools > button[aria-label="切换深浅主题"] {
+  display: none;
+}
+.pdf-app .workspace {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+  display: grid;
+  grid-template-columns: 359px minmax(0, 1fr) 426px;
+  gap: 14px;
+  margin: 0 8px;
+}
+.pdf-app .workspace.page-2 {
+  grid-template-columns: 350px minmax(0, 1fr) 424px;
+}
+.pdf-app .workspace.page-3 {
+  grid-template-columns: 383px minmax(0, 1fr) 422px;
+}
+.pdf-app .workspace.page-4 {
+  grid-template-columns: 344px minmax(0, 1fr) 418px;
+}
+.pdf-app .workspace.page-5 {
+  grid-template-columns: 343px minmax(0, 1fr) 417px;
+}
+.pdf-app .workspace.page-6 {
+  grid-template-columns: 366px minmax(0, 1fr) 409px;
+}
+.pdf-app .left-column,
+.pdf-app .right-column,
+.pdf-app .center-column {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: auto;
+  min-width: 0;
+  min-height: 0;
+  max-height: none;
+  overflow: auto;
+  grid-column: auto;
+  grid-row: auto;
+  scrollbar-width: thin;
+}
+.pdf-app .panel {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  flex-shrink: 0;
+  background: linear-gradient(125deg, #d5dee1, #dfe7e9);
+}
+.pdf-app .panel-title {
+  height: 44px;
+  min-height: 44px;
+  padding: 9px 15px;
+  font-size: 18px;
+  background: transparent;
+  border-bottom: 0;
+}
+.pdf-app .panel-collapse {
+  font-size: 18px;
+}
+.pdf-app .panel-title svg {
+  color: #ed6417;
+  width: 21px;
+  height: 21px;
+}
+.pdf-app .panel-collapse > svg {
+  width: 14px;
+  height: 14px;
+  color: #aebdc4;
+}
+.pdf-app .panel-body {
+  padding: 14px 16px;
+}
+.pdf-app .left-column > .panel:first-of-type > .panel-title {
+  background: linear-gradient(#5b6c74, #7b8c93);
+  color: white;
+}
+.pdf-app .left-column > .panel:first-of-type > .panel-title svg {
+  color: white;
+}
+.pdf-app .page-2 .left-column > .panel:first-of-type > .panel-title {
+  background: transparent;
+  color: var(--text);
+}
+.pdf-app .page-2 .left-column > .panel:first-of-type > .panel-title svg {
+  color: var(--orange);
+}
+.pdf-app .field {
+  display: grid;
+  grid-template-columns: 105px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 13px;
+  font-size: 14px;
+}
+.pdf-app .field > span {
+  font-size: 14px;
+  line-height: 1.45;
+}
+.pdf-app input,
+.pdf-app select,
+.pdf-app textarea {
+  background: var(--input);
+  color: var(--text);
+  border: 1px solid #cbd8dd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+.pdf-app .field input,
+.pdf-app .field select {
+  width: 100%;
+  height: 36px;
+  padding: 7px 9px;
+  min-width: 0;
+}
+.pdf-app .primary {
+  background: linear-gradient(110deg, #e96518, #e65a1c);
+  border: 1px solid #ef6822;
+  color: white;
+  min-height: 43px;
+  font-size: 17px;
+  border-radius: 6px;
+}
+.pdf-app .secondary {
+  background: var(--input);
+  border: 1px solid var(--border);
+}
+.pdf-app .viewer {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.pdf-app.light .viewer {
+  background: radial-gradient(ellipse at 45% 40%, #d1dcde, #cfdadb);
+}
+.pdf-app .viewer-heading {
+  min-height: 43px;
+  padding: 11px 15px 5px;
+  font-size: 18px;
+}
+.pdf-app .viewer-heading > span:first-child > svg {
+  width: 22px;
+  height: 22px;
+  color: #ed6417;
+}
+.pdf-app .viewer-toolbar {
+  display: flex;
+  flex-wrap: nowrap;
+  min-height: 51px;
+  padding: 5px 15px 11px;
+  gap: 8px;
+}
+.pdf-app .viewer-toolbar .segmented > button {
+  height: 35px;
+  min-width: 76px;
+  font-size: 14px;
+}
+.pdf-app .viewer-toolbar .segmented > button.active {
+  background: linear-gradient(110deg, #ed6715, #ee5710);
+  border-color: #ed6419;
+}
+.pdf-app .viewer-toolbar > button {
+  height: 35px;
+  padding: 7px 9px;
+}
+.pdf-app .viewer-toolbar .toolbar-grid {
+  display: none;
+}
+.pdf-app .point-size {
+  margin-left: auto;
+  font-size: 14px;
+  gap: 9px;
+  display: flex;
+  align-items: center;
+}
+.pdf-app .point-size > input {
+  width: 67px;
+  accent-color: #e75b17;
+}
+.pdf-app .point-size > span {
+  background: var(--input);
+  border-radius: 5px;
+  min-width: 36px;
+  height: 35px;
+}
+.pdf-app .main-cloud {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+}
+.pdf-app .cloud-canvas {
+  position: absolute;
+  inset: 0;
+}
+.pdf-app .viewer-toolbar .reset-label {
+  display: inline;
+}
+.pdf-app .viewer-toolbar > button[aria-label="重置视角"] svg {
+  display: none;
+}
+.pdf-app .legend {
+  top: 12px;
+  right: 15px;
+  background: #e9eff1df;
+  padding: 12px;
+  gap: 9px;
+  font-size: 13px;
+  min-width: 122px;
+}
+.pdf-app .viewport-tools {
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 24px;
+  border: 1px solid #bfced5;
+  border-radius: 6px;
+  min-height: 43px;
+  padding: 3px 8px;
+  background: #e8eff1ed;
+}
+.pdf-app .viewport-tools button {
+  width: 39px;
+  height: 34px;
+}
+.pdf-app .axis-widget {
+  left: 17px;
+  bottom: 40px;
+}
+.pdf-app .viewport-status {
+  flex-shrink: 0;
+  min-height: 32px;
+  gap: 15px;
+  font-size: 12px;
+}
+.pdf-app .page-2 .viewport-status,
+.pdf-app .page-4 .viewport-status {
+  display: none;
+}
+.pdf-app .recognition-frame-select {
+  height: 39px;
+  margin-bottom: 16px;
+}
+.pdf-app .recognition-actions {
+  padding-top: 0;
+  margin-top: 20px;
+}
+.pdf-app .recognition-actions .switch-row {
+  margin: 17px 0 20px;
+}
+.pdf-app .left-column details > summary {
+  height: 43px;
+  padding: 12px 4px;
+  margin: 0 0 16px;
+  font-size: 15px;
+}
+.pdf-app .left-column > .panel {
+  width: 100%;
+}
+.pdf-app .stats.recognition-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.pdf-app .recognition-stats > div {
+  background: var(--input);
+  border: 0;
+  padding: 12px 8px;
+  min-width: 0;
+}
+.pdf-app .recognition-stats small {
+  font-size: 13px;
+  white-space: nowrap;
+}
+.pdf-app .recognition-stats strong {
+  font-size: 25px;
+  margin-top: 9px;
+}
+.pdf-app .page-2 .right-column > .panel:nth-child(2) {
+  flex: 1;
+  min-height: 230px;
+}
+.pdf-app .page-2 .right-column > .panel:nth-child(2) > .panel-body {
+  height: calc(100% - 44px);
+  overflow: auto;
+}
+.pdf-app .compact-seams .seam-card {
+  min-height: 70px;
+  padding: 10px 3px;
+}
+.pdf-app .compact-seams .seam-select {
+  grid-template-columns: 16px 44px minmax(0, 1fr) 45px;
+}
+.pdf-app .compact-seams .seam-actions {
+  gap: 5px;
+}
+.pdf-app .compact-seams .seam-actions button {
+  background: #e8eeee;
+  min-height: 35px;
+  padding: 6px;
+}
+.pdf-app .logs-panel {
+  min-height: 180px;
+  flex: 1;
+}
+.pdf-app .page-2 .logs-panel {
+  flex: 0 0 225px;
+}
+.pdf-app .logs-panel .panel-body {
+  height: calc(100% - 44px);
+}
+.pdf-app .log-list {
+  height: 100%;
+  min-height: 100px;
+  max-height: none;
+  background: #d6e0e2;
+  padding: 10px;
+}
+.pdf-app .log-empty {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pdf-app .stats.calibration-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+.pdf-app .calibration-stats > div {
+  padding: 9px 3px;
+}
+.pdf-app .calibration-stats small {
+  font-size: 12px;
+}
+.pdf-app .calibration-stats strong {
+  font-size: 20px;
+}
+.pdf-app .calibration-stats strong.text-value {
+  font-size: 15px;
+}
+.pdf-app .calibration-state {
+  margin-bottom: 10px;
+}
+.pdf-app .page-3 .right-column > .panel:last-child {
+  flex: 1;
+}
+.pdf-app .page-3 .left-column > .panel {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.pdf-app .pair {
+  margin: 9px 0;
+  padding: 10px;
+  background: #e3eaec;
+}
+.pdf-app .pair-values {
+  gap: 8px;
+}
+.pdf-app .pair-values > input {
+  height: 31px;
+  padding: 5px;
+  font-size: 13px;
+}
+.pdf-app .matrix-placeholder > span {
+  font-size: 13px;
+  padding: 9px 4px;
+}
+.pdf-app .page-4 .left-column > .panel {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.pdf-app .page-4 .right-column > .panel:first-child {
+  flex: 0 0 auto;
+}
+.pdf-app .page-4 .seam-card {
+  padding: 13px 12px;
+  margin: 0 0 8px;
+}
+.pdf-app .page-4 .seam-actions > button {
+  height: 40px;
+}
+.pdf-app .page-4 .single-seam-actions {
+  background: #eadfd4;
+  margin: 16px -16px -14px;
+  padding: 12px 16px;
+}
+.pdf-app .page-4 .single-seam-actions > div {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+}
+.pdf-app .page-5 .left-column > .panel {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.pdf-app .page-5 .right-column > .panel {
+  flex: 1;
+  min-height: 0;
+}
+.pdf-app .page-5 .right-column > .panel > .panel-body {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 44px);
+  overflow: auto;
+}
+.pdf-app .page-5 .code-preview {
+  flex: 1;
+  min-height: 150px;
+  max-height: none;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.pdf-app .playback {
+  flex-shrink: 0;
+  min-height: 54px;
+  padding: 9px 12px;
+  margin: 0 14px 10px;
+  background: #e7eef0;
+  border-radius: 6px;
+}
+.pdf-app .page-5 .playback-guide {
+  padding: 0 15px 10px;
+  font-size: 13px;
+}
+.pdf-app .page-5 .program-coordinate-grid {
+  display: none;
+}
+.pdf-app .tcp-cells {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+.pdf-app .coordinate-pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.pdf-app .page-6 .viewer {
+  flex: 1 1 70%;
+  min-height: 0;
+}
+.pdf-app .page-6 .transfer-panel {
+  flex: 0 1 230px;
+  min-height: 0;
+  overflow: auto;
+}
+.pdf-app .page-6 .transfer-panel > .panel-body {
+  height: calc(100% - 44px);
+}
+.pdf-app .page-6 .left-column > .panel {
+  flex: 1;
+  min-height: 0;
+}
+.pdf-app .page-6 .left-column .field {
+  margin-bottom: 24px;
+  grid-template-columns: 100px minmax(0, 1fr);
+}
+.pdf-app .page-6 .right-column > .panel {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.pdf-app .file-transfer-layout {
+  height: 100%;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 12px;
+}
+.pdf-app .file-transfer-file,
+.pdf-app .file-transfer-result {
+  background: var(--panel-deep);
+  min-width: 0;
+}
+.pdf-app .file-transfer-result {
+  padding: 10px 12px;
+}
+.pdf-app .transfer-file-label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.pdf-app .task-center {
+  min-height: 64px;
+  height: 64px;
+  border-radius: 11px;
+  padding: 0 23px;
+  gap: 18px;
+  background: linear-gradient(117deg, #ccd4d7, #ccd6d7);
+}
+.pdf-app .task-toggle {
+  font-size: 16px;
+}
+.pdf-app .task-fold-label {
+  font-size: 16px;
+  color: inherit;
+}
+.pdf-app .footer-note {
+  margin-left: auto;
+  font-size: 13px;
+}
+.pdf-app .task-drawer {
+  bottom: 63px;
+}
+.pdf-app .overview {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 0;
+  margin: 0 8px;
+}
+.pdf-app .hero {
+  flex: 1.45;
+  min-height: 0;
+  border-radius: 10px;
+}
+.pdf-app .hero-copy {
+  top: 20%;
+  left: 48px;
+}
+.pdf-app .hero h1 {
+  font-size: 49px;
+  line-height: 1.4;
+}
+.pdf-app .hero-actions {
+  display: flex;
+  gap: 20px;
+  margin-top: 30px;
+}
+.pdf-app .hero-actions > button {
+  min-width: 210px;
+  min-height: 61px;
+  font-size: 20px;
+}
+.pdf-app .hero-cloud {
+  position: absolute;
+  left: 37%;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+}
+.pdf-app .workflow-cards {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 17px;
+  flex: 1;
+  min-height: 0;
+}
+.pdf-app .workflow-card {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding: 17px 18px;
+}
+.pdf-app .feature-heading {
+  font-size: 20px;
+}
+.pdf-app .workflow-card > p {
+  font-size: 14px;
+  margin: 10px 0 15px;
+}
+.pdf-app .feature-art {
+  min-height: 0;
+  height: calc(100% - 70px);
+}
+/* Fit four seam rows and all four existing actions inside their PDF module. */
+.pdf-app .compact-seams .seam-card {
+  grid-template-rows: 25px 25px;
+  min-height: 76px;
+  padding: 9px 4px;
+}
+.pdf-app .compact-seams .seam-actions {
+  gap: 3px;
+}
+.pdf-app .compact-seams .seam-actions > button {
+  min-height: 0;
+  height: 25px;
+  padding: 3px;
+  font-size: 0;
+}
+.pdf-app .page-2 .right-column > .panel:nth-child(2) {
+  min-height: 360px;
+}
+.pdf-app .page-2 .logs-panel {
+  flex: 1;
+  min-height: 170px;
+}
+.pdf-app .page-3 .right-column > .panel:first-child {
+  flex: 0 0 200px;
+}
+.pdf-app .page-3 .right-column > .panel:nth-child(2) {
+  flex: 0 0 220px;
+}
+.pdf-app .page-3 .matrix-placeholder > span {
+  padding: 6px 3px;
+  font-size: 12px;
+}
+.pdf-app .page-3 .right-column > .panel:last-child {
+  flex: 1;
+  min-height: 0;
+}
+.pdf-app .page-3 .right-column > .panel:last-child > .panel-body {
+  height: calc(100% - 44px);
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+.pdf-app .page-3 .right-column .detail-list {
+  gap: 7px;
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+.pdf-app .page-3 .right-column .notice {
+  font-size: 12px;
+  margin: 4px 0;
+  padding: 7px;
+}
+.pdf-app .page-3 .right-column .hint {
+  font-size: 12px;
+  margin: 5px 0;
+}
+.pdf-app .page-3 .right-column > .panel:last-child .primary {
+  margin-top: auto;
+  flex-shrink: 0;
+}
+.pdf-app .page-5 .right-column > .panel:first-child {
+  flex: 1.45;
+}
+.pdf-app .page-5 .right-column > .panel:last-child {
+  flex: 1;
+}
+.pdf-app .program-advanced > summary {
+  background: #d2dce0;
+  padding: 12px 16px !important;
+  margin: 0 -16px 15px !important;
+}
+
+
+/* Keep the reference appearance while sizing the workbench to the real window. */
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #d3dbde; }
+.pdf-stage { position: fixed; inset: 0; width: 100%; height: 100dvh; transform: none; }
+.pdf-app.app { width: 100%; height: 100%; min-width: 0; min-height: 0; }
+.pdf-app .topbar { min-width: 0; overflow-x: auto; overflow-y: hidden; }
+.pdf-app .topbar nav { flex-shrink: 0; }
+.pdf-app .workspace[class] { grid-template-columns: 359px minmax(0, 1fr) minmax(280px, 426px); min-width: 0; }
+.pdf-app .center-column { min-width: 0; overflow: hidden; }
+.pdf-app .viewer, .pdf-app .main-cloud { min-width: 0; }
+@media (max-width: 1199px) {
+  .pdf-app .workspace[class] { grid-template-columns: 320px minmax(0, 1fr); }
+  .pdf-app .workspace > .right-column { display: none; }
+}
+@media (max-width: 700px) {
+  .pdf-app .workspace[class] { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(120px, 35%) minmax(0, 1fr); }
+  .pdf-app .workspace .left-column { grid-row: 1; grid-column: 1; }
+  .pdf-app .workspace .center-column { grid-row: 2; grid-column: 1; }
+  .pdf-app .viewer, .pdf-app .main-cloud { min-height: 0; }
+}
+
+.pdf-app .brand { width: auto; min-width: 305px; white-space: nowrap; font-size: 21px; }
+
+.pdf-app .brand img.brand-symbol { width: 48px; height: 48px; object-fit: contain; flex-shrink: 0; border-radius: 5px; }
+
+/* Dense desktop layout: smaller containers and spacing, readable text at 100% zoom. */
+.pdf-app.app { padding: 10px 12px; gap: 10px; font-size: 16px; }
+.pdf-app .topbar { display: flex; height: 60px; min-height: 60px; padding: 0 12px; gap: 8px; overflow: visible; }
+.pdf-app .brand { min-width: 282px; font-size: 21px; gap: 8px; }
+.pdf-app .brand img.brand-symbol { width: 40px; height: 40px; }
+.pdf-app .topbar nav { min-width: 0; flex: 1; flex-shrink: 1; gap: 2px; }
+.pdf-app .topbar nav > button { padding: 0 6px; gap: 5px; font-size: 15px; }
+.pdf-app .health { gap: 4px; }
+.pdf-app .health > span { height: 30px; padding: 3px 5px; font-size: 14px; }
+.pdf-app .header-tools { gap: 4px; }
+.pdf-app .header-tools .demo-tag { height: 30px; min-height: 30px; padding: 3px 5px; }
+.pdf-app .header-tools > button { min-width: 26px; }
+.pdf-app .workspace[class] { grid-template-columns: 288px minmax(0, 1fr) 300px; gap: 10px; margin: 0; }
+.pdf-app .left-column, .pdf-app .right-column, .pdf-app .center-column { gap: 10px; }
+.pdf-app .panel-title { height: 34px; min-height: 34px; padding: 6px 10px; font-size: 18px; }
+.pdf-app .panel-collapse { font-size: 18px; }
+.pdf-app .panel-body { padding: 8px 10px; }
+.pdf-app .field { grid-template-columns: 105px minmax(0, 1fr); gap: 6px; margin-bottom: 6px; }
+.pdf-app .field > span { font-size: 15px; line-height: 1.25; }
+.pdf-app input, .pdf-app select, .pdf-app textarea { padding: 5px 7px; font-size: 16px; }
+.pdf-app .field input, .pdf-app .field select { min-height: 30px; }
+.pdf-app .switch-row { margin: 7px 0; font-size: 15px; }
+.pdf-app .primary, .pdf-app .secondary { min-height: 32px; padding: 6px 10px; font-size: 16px; }
+.pdf-app .hint { margin: 5px 0; font-size: 14px; }
+.pdf-app .notice { padding: 7px 8px; margin: 7px 0; font-size: 14px; }
+.pdf-app .recognition-actions { margin-top: 10px; }
+.pdf-app .recognition-actions .switch-row { margin: 8px 0; }
+.pdf-app .recognition-frame-select { height: 32px; margin-bottom: 8px; }
+.pdf-app .recognition-stats small, .pdf-app .calibration-stats small { font-size: 14px; }
+.pdf-app .recognition-stats > div { padding: 7px 4px; }
+.pdf-app .recognition-stats strong { font-size: 21px; }
+.pdf-app .page-2 .right-column > .panel:nth-child(2) { min-height: 0; flex: 1; }
+.pdf-app .page-2 .logs-panel { flex: 0 0 140px; min-height: 0; }
+.pdf-app .compact-seams .seam-card { min-height: 64px; grid-template-rows: 22px 22px; padding: 6px 4px; }
+.pdf-app .compact-seams .seam-actions > button { height: 24px; }
+.pdf-app .page-3 .right-column > .panel:first-child { flex-basis: 150px; }
+.pdf-app .page-3 .right-column > .panel:nth-child(2) { flex-basis: 160px; }
+.pdf-app .page-3 .right-column .detail-list { gap: 4px; font-size: 14px; }
+.pdf-app .viewer-heading { min-height: 34px; padding: 6px 10px; }
+.pdf-app .viewer-toolbar { min-height: 38px; padding: 2px 10px 6px; }
+.pdf-app .viewer-toolbar button { min-height: 30px; }
+.pdf-app .program-advanced > summary { padding: 8px 10px !important; margin: 0 -10px 8px !important; }
+.pdf-app .task-center { height: 44px; min-height: 44px; padding: 0 12px; }
+.pdf-app .task-toggle, .pdf-app .task-toggle strong { font-size: 16px; }
+.pdf-app .footer-note, .pdf-app .footer-task, .pdf-app .history-button { font-size: 14px; }
+.pdf-app .task-drawer { bottom: 43px; }
+@media (max-width: 1450px) {
+  .pdf-app .topbar { height: 84px; min-height: 84px; flex-wrap: wrap; align-content: center; gap: 2px 8px; }
+  .pdf-app .topbar .brand { margin-right: auto; }
+  .pdf-app .topbar nav { order: 10; flex: 1 0 100%; height: 32px; justify-content: space-between; }
+  .pdf-app .topbar nav > button.active:after { bottom: 0; }
+}
+@media (max-width: 1199px) {
+  .pdf-app .workspace[class] { grid-template-columns: 288px minmax(0, 1fr); }
+}
+@media (max-width: 700px) {
+  .pdf-app .workspace[class] { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(120px, 35%) minmax(0, 1fr); }
+  .pdf-app .topbar .health, .pdf-app .header-tools .demo-tag, .pdf-app .avatar { display: none; }
+}
+.pdf-app .logs-panel .panel-body { height: calc(100% - 34px); }
+.pdf-app .log-list { min-height: 0; padding: 6px; }
+.pdf-app .page-4 .right-column > .panel:first-child { flex: 1; min-height: 0; }
+.pdf-app .page-4 .right-column .logs-panel { flex: 0 0 130px; min-height: 0; }
+.pdf-app .geometry-seam-heading { padding: 7px 10px; margin: -8px -10px 8px; }
+.pdf-app .geometry-seam-heading > span { font-size: 14px; }
+.pdf-app .seam-geometry { gap: 6px 8px; margin-block: 8px; font-size: 15px; }
+.pdf-app .endpoint { padding: 7px 2px; gap: 6px; font-size: 15px; }
+.pdf-app .endpoint p { margin-top: 4px; font-size: 14px; }
+.pdf-app .page-4 .single-seam-actions { margin: 8px -10px -8px; padding: 8px 10px; }
+.pdf-app .single-seam-actions h3 { margin-bottom: 7px; }
+.pdf-app .single-seam-actions button { padding: 5px 0; gap: 4px; font-size: 14px; }
+.pdf-app .page-5 .right-column > .panel:first-child { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.pdf-app .page-5 .right-column > .panel:first-child > .panel-body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 6px; }
+.pdf-app .page-5 .right-column > .panel:last-child { flex: 0 0 auto; }
+.pdf-app .page-5 .code-preview { flex: 1; min-height: 60px; max-height: none; margin: 0; font-size: 14px; }
+.pdf-app .page-5 .issues { flex-shrink: 0; margin: 0; }
+.pdf-app .page-5 .issues ul { max-height: 66px; overflow: auto; font-size: 14px; }
+.pdf-app .page-5 .two-buttons { flex-shrink: 0; margin-top: 0; }
+.pdf-app .tcp-cells > div { padding: 6px; }
+.pdf-app .tcp-cells strong { font-size: 20px; }
+.pdf-app .coordinate-pair { gap: 6px; margin-top: 8px; }
+.pdf-app .coordinate-pair p { font-size: 14px; margin: 5px 0 0; }
+
+/* Give the point cloud the largest share without shrinking the canvas or text by transforms. */
+.pdf-app .workspace[class] { grid-template-columns: 248px minmax(0, 1fr) 260px; }
+.pdf-app .left-column .panel-title, .pdf-app .right-column .panel-title,
+.pdf-app .left-column .panel-collapse, .pdf-app .right-column .panel-collapse { font-size: 16px; }
+.pdf-app .left-column .field { grid-template-columns: 89px minmax(0, 1fr); gap: 4px; }
+.pdf-app .left-column .field > span, .pdf-app .left-column input, .pdf-app .left-column select,
+.pdf-app .left-column .switch-row, .pdf-app .right-column .detail-list { font-size: 14px; }
+.pdf-app .left-column .notice, .pdf-app .right-column .notice, .pdf-app .left-column .hint, .pdf-app .right-column .hint { font-size: 13px; }
+.pdf-app .header-tools > button[aria-label="切换深浅主题"] { display: inline-flex; }
+/* Status cards size to content. The previous fixed 150px clipped the second row. */
+.pdf-app .page-3 .right-column > .panel:first-child { flex: 0 0 auto; overflow: visible; }
+.pdf-app .stats.calibration-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+.pdf-app .calibration-stats > div { min-height: 44px; padding: 5px 6px; }
+.pdf-app .calibration-stats small { font-size: 12px; }
+.pdf-app .calibration-stats strong { font-size: 17px; }
+.pdf-app .calibration-stats strong.text-value { font-size: 14px; }
+.pdf-app .calibration-state { margin-bottom: 7px; font-size: 14px; }
+.pdf-app .page-3 .right-column > .panel:nth-child(2) { flex: 0 0 auto; }
+.pdf-app .page-3 .matrix-placeholder > span { padding: 4px 1px; font-size: 11px; }
+.pdf-app .page-3 .right-column > .panel:last-child > .panel-body { height: calc(100% - 34px); }
+.pdf-app .right-column .endpoint { font-size: 13px; }
+.pdf-app .right-column .endpoint p, .pdf-app .right-column .seam-geometry { font-size: 13px; }
+.pdf-app .right-column .coordinate-pair { grid-template-columns: minmax(0, 1fr); }
+.pdf-app .right-column .tcp-cells strong { font-size: 17px; }
+.pdf-app.app:not(.light) { color-scheme: dark; --bg: #0b1218; --panel: #14212b; --panel-deep: #0e1922; --text: #e6edf3; --muted: #8fa5b4; --border: #293d4b; --input: #1b2c38; --soft: #1b2c38; --heading: #172631; --orange: #f18b3e; --orange-bg: #402d21; background: #0b1218; }
+.pdf-app:not(.light) .panel, .pdf-app:not(.light) .topbar { background: #14212b; border-color: var(--border); }
+.pdf-app:not(.light) .viewer { background: radial-gradient(ellipse at 45% 40%, #10202b, #0b151e); }
+.pdf-app:not(.light) .health > span, .pdf-app:not(.light) .demo-tag,
+.pdf-app:not(.light) .cloud-tools, .pdf-app:not(.light) .legend,
+.pdf-app:not(.light) .seam-card, .pdf-app:not(.light) .pair,
+.pdf-app:not(.light) .logs-panel .log-list, .pdf-app:not(.light) .log-list,
+.pdf-app:not(.light) .seam-geometry, .pdf-app:not(.light) .endpoint,
+.pdf-app:not(.light) .tcp-cells > div, .pdf-app:not(.light) .coordinate-pair > div,
+.pdf-app:not(.light) .playback-controls, .pdf-app:not(.light) .program-preview-tabs,
+.pdf-app:not(.light) .task-center { background: var(--panel-deep); color: var(--text); border-color: var(--border); }
+.pdf-app:not(.light) .panel-title { background: transparent; color: var(--text); }
+.pdf-app:not(.light) .panel-title.featured { background: #243b49; }
+.pdf-app:not(.light) .pair.active, .pdf-app:not(.light) .seam-card.selected { background: #3b3026; border-color: #a16635; }
+.pdf-app:not(.light) .geometry-seam-heading { background: #233949; }
+.pdf-app:not(.light) .viewer-toolbar button { color: var(--text); }
+.pdf-app:not(.light) .viewer-toolbar button.active { color: white; }
+.pdf-app:not(.light) .code-preview { background: #09141c; }
+@media (max-width: 1199px) and (min-width: 701px) { .pdf-app .workspace[class] { grid-template-columns: 232px minmax(0, 1fr); } }
+@media (max-width: 700px) { .pdf-app .workspace[class] { grid-template-columns: minmax(0, 1fr); } }
+@media (min-width: 1451px) and (max-width: 1650px) { .pdf-app .topbar nav > button { font-size: 14px; padding-inline: 4px; gap: 4px; } .pdf-app .health > span { font-size: 12px; } }
+
+/* Keep the transfer summary compact so the point cloud remains the main view. */
+.pdf-app .page-6 .file-transfer-file { padding: 10px 12px; }
+.pdf-app .page-6 .file-transfer-file h3 { margin-bottom: 8px; }
+.pdf-app .page-6 .file-transfer-file h4 { margin: 10px 0 8px; }
+.pdf-app .page-6 .transfer-stepper > div { gap: 4px; }
+.pdf-app .page-6 .transfer-progress { margin-top: 10px; }
+.pdf-app .page-6 .file-transfer-result > svg { width: 26px; height: 26px; margin-bottom: 2px; }
+.pdf-app .page-6 .file-transfer-result h3 { margin: 4px 0; }
+.pdf-app .page-6 .file-transfer-result > p { margin: 3px 0; line-height: 1.5; }
+.pdf-app .page-6 .file-transfer-result > .secondary { margin-top: 6px; }
+
+.app-header-space { height: 76px; min-height: 76px; flex: 0 0 76px; grid-column: 1 / -1; pointer-events: none; }
+
+/* Transfer page: keep the confirmation visible and the summary free of inner scrolling. */
+.pdf-app .page-6 .left-column { overflow: visible; }
+.pdf-app .page-6 .left-column > .panel { flex: 0 0 auto; overflow: visible; }
+.pdf-app .page-6 .left-column .panel-body { height: auto; padding: 10px; overflow: visible; }
+.pdf-app .page-6 .left-column .form-section-label { margin-bottom: 12px; }
+.pdf-app .page-6 .left-column .field { margin-bottom: 10px; grid-template-columns: 82px minmax(0, 1fr); }
+.pdf-app .page-6 .left-column .field > span { width: auto; }
+.pdf-app .page-6 .left-column .field input { height: 32px; min-height: 32px; }
+.pdf-app .page-6 .left-column .switch-row { margin-block: 8px; min-height: 28px; }
+.pdf-app .page-6 .left-column .notice { margin-block: 8px; padding: 8px; font-size: 13px; }
+.pdf-app .page-6 .left-column .primary.wide { margin-top: 6px; min-height: 36px; }
+.pdf-app .page-6 .left-column .hint { margin: 6px 0 0; font-size: 12px; }
+.pdf-app .page-6 .center-column > .panel.transfer-panel:last-child { flex: 0 0 auto; height: auto; min-height: 0; overflow: visible; }
+.pdf-app .page-6 .transfer-panel > .panel-body { height: auto; padding: 8px; overflow: visible; }
+.pdf-app .page-6 .file-transfer-layout { height: auto; align-items: stretch; gap: 8px; }
+.pdf-app .page-6 .file-transfer-file, .pdf-app .page-6 .file-transfer-result { padding: 8px 10px; }
+.pdf-app .page-6 .file-transfer-file h3 { font-size: 14px; margin-bottom: 6px; }
+.pdf-app .page-6 .file-transfer-file h4 { margin: 8px 0 5px; font-size: 13px; }
+.pdf-app .page-6 .transfer-stepper > div { font-size: 12px; gap: 3px; }
+.pdf-app .page-6 .transfer-file-label > svg { width: 24px; height: 24px; }
+.pdf-app .page-6 .transfer-file-label small { margin-top: 3px; }
+.pdf-app .page-6 .transfer-progress { margin-top: 8px; height: 5px; }
+.pdf-app .page-6 .file-transfer-file > .hint { margin-top: 5px; }
+.pdf-app .page-6 .file-transfer-result h3 { font-size: 14px; }
+.pdf-app .page-6 .file-transfer-result > p { font-size: 12px; overflow-wrap: anywhere; }
+.pdf-app .page-6 .file-transfer-result > .secondary { padding: 5px 8px; min-height: 28px; font-size: 12px; }
+.pdf-app .page-6 .viewer { flex: 1 1 0; min-height: 0; }
+
+/* Calibration actions must fit the narrow workflow sidebar. */
+.pdf-app .page-3 .calibration-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.pdf-app .page-3 .calibration-buttons > button { width: 100%; min-width: 0; margin: 0; padding: 8px 6px; min-height: 36px; font-size: 14px; line-height: 1.3; white-space: nowrap; }
+.pdf-app .page-3 .calibration-buttons > button:last-child { grid-column: 1 / -1; }

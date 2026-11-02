@@ -1,0 +1,35 @@
+.header { display:flex; align-items:center; gap:14px; width:100%; height:76px; min-height:76px; padding:0 20px; border:1px solid #edf3f3; border-radius:14px; background:linear-gradient(105deg,#e6eded,#dce6e9); color:#536b79; box-sizing:border-box; white-space:nowrap; overflow-x:auto; scrollbar-width:thin; grid-column:1 / -1; }
+.header button { display:inline-flex; align-items:center; justify-content:center; gap:6px; background:transparent; color:inherit; border:0; padding:0; cursor:pointer; font:inherit; flex-shrink:0; }
+.header .brand { gap:14px; color:#243540; }
+.brand img { width:68px; height:68px; object-fit:contain; }
+.brand strong { font-size:25px; font-weight:750; }
+.header nav { display:flex; align-items:center; justify-content:flex-start; flex:1; gap:24px; min-width:0; margin-left:30px; height:100%; }
+.header nav button { font-size:16px; height:40px; }
+.header nav button[aria-current="page"] { color:#ed6417; }
+.health { display:flex; gap:8px; align-items:center; }
+.health button { font-size:12px; padding:7px 4px; border-radius:4px; background:#e4ecef80; }
+.health i { width:6px; height:6px; border-radius:50%; background:#e67966; }
+.health i[data-color="green"] { background:#25b85b; }
+.health i[data-color="yellow"] { background:#dca744; }
+.tools { display:flex; gap:18px; align-items:center; }
+.tools .mode { font-size:16px; }
+.dark { background:#14212b; border-color:#293d4b; color:#c4d2dc; }
+.dark .brand { color:#e6edf3; }
+.dark .health button { background:#1b2c38; }
+@media(max-width:1650px) { .header { gap:10px; padding-inline:14px; } .brand strong { font-size:21px; } .header nav { gap:16px; margin-left:24px; min-width:0; } .tools { gap:12px; } }
+
+/* Isolate shared geometry from the acquisition grid and legacy PDF selectors. */
+.header { flex: 0 0 76px; max-height: 76px; margin: 0; font: 16px/1.25 Arial, "Microsoft YaHei", "Noto Sans CJK SC", sans-serif; letter-spacing: 0; }
+.header .brand img { width: 68px; height: 68px; min-width: 68px; max-width: 68px; flex: 0 0 68px; }
+.header button { line-height: 1.25; letter-spacing: 0; }
+.header nav button { font-weight: 400; }
+.header svg { flex-shrink: 0; }
+
+/* One persistent header outside both page shells: identical bounds and inheritance. */
+.header { position: fixed; top: 10px; left: 12px; right: 12px; width: auto; z-index: 60; }
+.health, .tools { flex-shrink: 0; }
+.header nav { flex-shrink: 0; }
+
+/* Transparent artwork retains the complete gear outline and white lettering. */
+.header .brand img { object-fit: contain; clip-path: none; mix-blend-mode: normal; }
+.dark .brand img { mix-blend-mode: normal; }

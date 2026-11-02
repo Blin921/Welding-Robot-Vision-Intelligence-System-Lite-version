@@ -1,0 +1,58 @@
+/* Homepage only: native controls and responsive columns, independent of the workbench. */
+.pdf-app.app:has(.home-overview) {
+  background:
+    radial-gradient(ellipse at 68% 24%, #edf6ffb8, transparent 65%),
+    linear-gradient(130deg, #dde8f2, #edf3f8 56%, #dce9f4);
+}
+.pdf-app:has(.home-overview) .topbar { border-radius: 32px; background: #f8fbffbd; border: 1px solid #ffffffd9; box-shadow: 0 6px 24px #56718c0a; }
+.pdf-app:has(.home-overview) .task-center { border-radius: 24px; background: #f8fbffb3; border-color: #ffffffd9; }
+.pdf-app .home-overview { display: grid; grid-template-rows: minmax(0, 1fr) minmax(210px, 42%); flex: 1; min-height: 0; gap: 16px; margin: 0; isolation: isolate; }
+.pdf-app .home-overview .hero { display: grid; grid-template-columns: minmax(0, 40%) minmax(0, 60%); position: relative; min-height: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; overflow: hidden; }
+.pdf-app .home-overview .hero::before { content: ""; position: absolute; inset: 4% 4% 0 25%; pointer-events: none; border-radius: 50%; background: radial-gradient(ellipse, #ffffff82, #ffffff00 72%); }
+.pdf-app .home-overview .hero-copy { position: relative; inset: auto; width: auto; padding: 22px 32px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 20px; pointer-events: auto; z-index: 2; }
+.pdf-app .home-overview .home-eyebrow { display: flex; align-items: center; gap: 12px; font-size: 14px; color: #607d99; letter-spacing: 1px; }
+.pdf-app .home-overview .hero-rule { width: 32px; height: 3px; border-radius: 3px; background: #ed792e; margin: 0; }
+.pdf-app .home-overview .hero h1 { font-size: clamp(30px, 2.65vw, 48px); line-height: 1.35; letter-spacing: 0; font-weight: 700; color: #142b40; margin: 0; }
+.pdf-app .home-overview .hero-actions { display: flex; flex-wrap: nowrap; width: 100%; max-width: 480px; gap: 14px; margin: 0; }
+.pdf-app .home-overview .hero-actions > button { flex: 1; min-width: 0; height: 46px; min-height: 46px; padding: 8px 14px; border-radius: 28px; font-size: 16px; white-space: nowrap; }
+.pdf-app .home-overview .hero-actions > .primary { border: 1px solid #ff9a5b; background: linear-gradient(120deg, #ff8b31, #f16a15); box-shadow: 0 6px 20px #e8853c25; }
+.pdf-app .home-overview .hero-actions > .hero-demo { color: #cf681e; background: #ffffffa6; border: 1px solid #e9b897; box-shadow: none; }
+.pdf-app .home-overview .hero-cloud { position: relative; inset: auto; width: 100%; height: 100%; min-width: 0; min-height: 0; pointer-events: auto; }
+.pdf-app .home-overview .hero-edge { display: none; }
+.pdf-app .home-overview .hero-cloud > .process-launch { bottom: 12px; right: 16px; left: auto; border-radius: 24px; padding: 9px 14px !important; border-color: #ffffffd9 !important; background: #f9fcffcc !important; color: #36506c !important; box-shadow: 0 4px 18px #416b8a12; }
+.pdf-app .home-overview .hero-cloud > .process-launch svg { color: #f57924; }
+.pdf-app .home-overview .workflow-cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; flex: none; min-height: 0; }
+.pdf-app .home-overview .workflow-card { position: relative; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; min-width: 0; min-height: 0; height: 100%; padding: 16px 14px 8px; gap: 6px; border-radius: 16px; border: 1px solid #ffffffdc; background: linear-gradient(145deg, #f9fcffce, #edf5ff96); box-shadow: 0 7px 22px #56799b0c, inset 0 1px 0 #ffffff8f; overflow: hidden; text-align: left; transition: border-color .15s, box-shadow .15s; }
+.pdf-app .home-overview .workflow-card:hover { border-color: #efa673; box-shadow: 0 8px 25px #71869e1c; transform: none; }
+.pdf-app .home-overview .workflow-card:focus-visible { outline: 2px solid #f58b3a; outline-offset: -3px; }
+.pdf-app .home-overview .feature-heading { display: flex; align-items: center; gap: 7px; position: relative; min-height: 28px; }
+.pdf-app .home-overview .feature-heading > svg { width: 23px; height: 23px; color: #f37927; }
+.pdf-app .home-overview .feature-heading > h2 { font-size: clamp(13px, 1.05vw, 18px); line-height: 1.3; font-weight: 600; color: #243e56; white-space: normal; }
+.pdf-app .home-overview .feature-heading > .home-feature-index { display: block; min-width: 24px; height: auto; margin: 0 1px 0 0; border-radius: 0; background: none; color: #b8cbdc; font-size: 24px; font-style: italic; font-weight: 600; }
+.pdf-app .home-overview .feature-heading > span:last-child { flex-shrink: 0; min-width: 22px; width: 22px; height: 22px; background: #ffffff8c; border: 1px solid #f4bc96; color: #e27831; }
+.pdf-app .home-overview .workflow-card > p { margin: 0; padding-left: 33px; color: #7e95aa; font-size: 13px; line-height: 1.4; white-space: normal; }
+.pdf-app .home-overview .feature-image { position: relative; flex: 1; min-height: 0; margin: 0 -8px; width: calc(100% + 16px); background: none; border: 0; border-radius: 0; overflow: hidden; }
+.pdf-app .home-overview .home-feature-art { position: absolute; inset: 0; overflow: hidden; }
+.pdf-app .home-overview .home-feature-strip { position: absolute; width: 500%; max-width: none; height: 100%; object-fit: fill; top: 0; pointer-events: none; user-select: none; }
+.pdf-app .home-overview .feature-legend { inset: auto 0 0; display: flex; flex-direction: row; justify-content: center; gap: 10px; background: linear-gradient(transparent, #eff6ffdb); box-shadow: none; padding: 12px 4px 4px; font-size: 11px; color: #657f96; }
+.pdf-app .home-overview .feature-legend > span { gap: 4px; }
+.pdf-app:not(.light):has(.home-overview) { background: radial-gradient(ellipse at 72% 20%, #1c3449, transparent 66%), #0b151e; }
+.pdf-app:not(.light):has(.home-overview) .topbar, .pdf-app:not(.light):has(.home-overview) .task-center { background: #142431d9; border-color: #35516a66; }
+.pdf-app:not(.light) .home-overview .hero::before { background: radial-gradient(ellipse, #2945604a, transparent 72%); }
+.pdf-app:not(.light) .home-overview .hero h1, .pdf-app:not(.light) .home-overview .feature-heading > h2 { color: #e3edf6; }
+.pdf-app:not(.light) .home-overview .home-eyebrow { color: #92abc0; }
+.pdf-app:not(.light) .home-overview .workflow-card { background: linear-gradient(145deg, #1a3042d9, #142533e0); border-color: #3e5c7459; box-shadow: inset 0 1px 0 #7594aa0c; }
+.pdf-app:not(.light) .home-overview .home-feature-index { color: #4d6c84; }
+.pdf-app:not(.light) .home-overview .feature-legend { background: linear-gradient(transparent, #142533e0); color: #a5bbce; }
+.pdf-app:not(.light) .home-overview .hero-actions > .hero-demo { background: #223849a6; color: #ffc08c; border-color: #8c694b; }
+.pdf-app:not(.light) .home-overview .hero-cloud > .process-launch { background: #21394acc !important; color: #e2edf5 !important; border-color: #46647c !important; }
+@media (min-width: 1650px) { .pdf-app .home-overview .hero-copy { padding-inline: 54px; } .pdf-app .home-overview .hero-actions > button { min-height: 52px; height: 52px; font-size: 18px; } }
+@media (max-width: 1200px) { .pdf-app .home-overview .hero-copy { padding-inline: 20px; } .pdf-app .home-overview .workflow-card { padding: 12px 9px 6px; } .pdf-app .home-overview .feature-heading > .home-feature-index { display: none; } .pdf-app .home-overview .workflow-card > p { padding-left: 0; } }
+@media (max-height: 720px) { .pdf-app .home-overview .hero-copy { gap: 12px; padding-block: 14px; } .pdf-app .home-overview .hero h1 { font-size: clamp(28px, 2.4vw, 40px); } .pdf-app .home-overview .workflow-card { padding-top: 10px; } }
+@media (max-width: 700px) { .pdf-app .home-overview { overflow: auto; grid-template-rows: minmax(290px, 45vh) auto; } .pdf-app .home-overview .hero { grid-template-columns: 1fr; } .pdf-app .home-overview .hero-copy { z-index: 2; padding: 18px; justify-content: flex-end; } .pdf-app .home-overview .hero-cloud { position: absolute; inset: 0 0 40% 28%; width: auto; height: auto; opacity: .5; } .pdf-app .home-overview .hero h1 { font-size: 30px; } .pdf-app .home-overview .workflow-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 230px; } }
+.pdf-app .home-overview svg.home-feature-art { width: 100%; height: 100%; }
+
+.pdf-app .home-overview svg.home-feature-art { transform: scale(1.08); transform-origin: 50% 54%; }
+
+.home-page .workflow-cards, .workflow-cards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+@media (max-width: 900px) { .home-page .workflow-cards, .workflow-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

@@ -1,0 +1,26 @@
+/* Shared, embedded process presentation. The real point-cloud view remains mounted. */
+.process-launch { position: absolute; left: 14px; bottom: 72px; z-index: 12; padding: 7px 11px !important; border: 1px solid #eb8d42 !important; border-radius: 6px; background: #19313ded !important; color: #ffb779 !important; font-size: 14px; }
+.process-presentation { --motion-bg: #0d1922; --motion-panel: #172b38ed; --motion-line: #35505e; --motion-text: #e4edf4; --motion-muted: #9bb0bf; position: absolute; inset: 0; z-index: 20; color: var(--motion-text); background: var(--motion-bg); overflow: hidden; }
+.process-light { --motion-bg: #d9e4e9; --motion-panel: #edf4f7ed; --motion-line: #b7cbd7; --motion-text: #253c4a; --motion-muted: #627e90; }
+.process-scene, .process-scene > div { position: absolute; inset: 0; }
+.process-scene canvas { display: block; width: 100%; height: 100%; }
+.process-title { position: absolute; inset: 12px 14px auto; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; pointer-events: none; }
+.process-title strong { display: block; font-size: 18px; }
+.process-title small { display: block; margin-top: 5px; font-size: 13px; color: var(--motion-muted); }
+.process-title button, .process-controls button { pointer-events: auto; background: var(--motion-panel) !important; color: var(--motion-text) !important; border: 1px solid var(--motion-line) !important; border-radius: 5px; padding: 6px 8px !important; font-size: 14px; }
+.process-phases { position: absolute; left: 14px; top: 70px; display: flex; flex-wrap: wrap; padding: 0; gap: 6px; margin: 0; list-style: none; pointer-events: none; }
+.process-phases li { display: flex; align-items: center; gap: 5px; padding: 6px 8px; border-radius: 5px; background: var(--motion-panel); color: var(--motion-muted); font-size: 13px; }
+.process-phases i { font-style: normal; }
+.process-phases .active { color: #f7a25d; box-shadow: inset 0 0 0 1px #ed9346; }
+.process-phases .done { color: #62cfa6; }
+.process-controls { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); width: min(540px, calc(100% - 28px)); padding: 8px; display: flex; align-items: center; gap: 8px; border-radius: 8px; background: var(--motion-panel); border: 1px solid var(--motion-line); font-size: 14px; }
+.process-controls input[type="range"] { flex: 1; width: 0; min-width: 40px; accent-color: #ef8c3c; }
+.process-controls select { padding: 4px !important; width: 64px; color: var(--motion-text) !important; background: var(--motion-panel) !important; border-color: var(--motion-line) !important; font-size: 14px !important; }
+.process-controls span { width: 38px; text-align: right; }
+.hero-cloud { position: relative; }
+@media (prefers-reduced-motion: reduce) { .process-presentation * { transition: none; } }
+.process-scene .sample-webgl-error { position: absolute; inset: 35% 10% auto; padding: 16px; background: var(--motion-panel); color: var(--motion-text); text-align: center; }
+/* ResizeObserver pauses the covered renderer at zero size; returning paints immediately. */
+.process-presentation ~ .cloud-canvas { display: none; }
+.pdf-app .hero-cloud { pointer-events: auto; }
+.hero-cloud > .process-launch { left: auto; right: 14px; bottom: 14px; }
