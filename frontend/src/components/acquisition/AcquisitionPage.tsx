@@ -15,7 +15,6 @@ import {
   CloudUpload,
   Database,
   Download,
-  FolderOpen,
   Hand,
   History,
   Info,
@@ -504,24 +503,7 @@ export default function AcquisitionPage({
                 h={20}
                 style={{ position: "absolute", left: 63, top: 46 }}
               />
-              <div className={styles.loadedFile}>
-                <FolderOpen size={20} />
-                <span>已载入点云：</span>
-                <strong title={filename(state.frame)}>
-                  {filename(state.frame)}
-                </strong>
-                <button
-                  aria-label="卸载当前点云"
-                  disabled={!state.frame || pending}
-                  title="卸载视图，保留帧列表"
-                  onClick={() => {
-                    store.unloadFrame();
-                    setMeasurement(null);
-                  }}
-                >
-                  <Trash2 size={18} />
-                </button>
-              </div>
+
           </section>
           <section
             className={`${styles.panel} ${styles.scanSettings} ${folded.parameters ? styles.folded : ""}`}

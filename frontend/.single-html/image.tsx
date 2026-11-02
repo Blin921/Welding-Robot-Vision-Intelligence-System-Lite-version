@@ -1,0 +1,1 @@
+import React from 'react';export default function Image({priority,unoptimized,fill,...props}){return <img {...props}/>;}

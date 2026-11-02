@@ -1,0 +1,1 @@
+import React,{Suspense} from 'react';export default function dynamic(loader,options={}){const C=React.lazy(loader);return React.forwardRef((props,ref)=><Suspense fallback={options.loading?React.createElement(options.loading):null}><C {...props} ref={ref}/></Suspense>);}

@@ -1,0 +1,1 @@
+import {parsePcd} from '../src/lib/acquisition/pcd';export async function parsePcdFile(file,frame){return parsePcd(await file.arrayBuffer(),frame);}
